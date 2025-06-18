@@ -4,7 +4,6 @@ import {
   Switch,
   Button,
   Flex,
-  Link,
   Stack,
   FormLabel,
   DarkMode,
@@ -22,8 +21,6 @@ import {
   HStack,
 } from '@chakra-ui/react'
 import { ExternalLinkIcon, SmallCloseIcon, CheckIcon } from '@chakra-ui/icons'
-import { DiGithubBadge } from 'react-icons/di'
-import { AiFillThunderbolt } from 'react-icons/ai'
 import { SiTypescript } from 'react-icons/si'
 import { buildParameters } from '~utils/codesandbox'
 import { generateCode } from '~utils/code'
@@ -126,21 +123,6 @@ const Header = () => {
         height="3rem"
         px="1rem"
       >
-        <Flex
-          width="14rem"
-          height="100%"
-          backgroundColor="#1a202c"
-          color="white"
-          as="a"
-          fontSize="xl"
-          flexDirection="row"
-          alignItems="center"
-          aria-label="Chakra UI, Back to homepage"
-        >
-          <Box fontSize="2xl" as={AiFillThunderbolt} mr={1} color="teal.100" />{' '}
-          <Box fontWeight="bold">open</Box>chakra
-        </Flex>
-
         <Flex flexGrow={1} justifyContent="space-between" alignItems="center">
           <HStack spacing={4} justify="center" align="center">
             <Box>
@@ -249,24 +231,6 @@ const Header = () => {
             </Popover>
           </Stack>
         </Flex>
-
-        <Stack
-          justifyContent="flex-end"
-          width="13rem"
-          align="center"
-          direction="row"
-          spacing="2"
-        >
-          <Link isExternal href="https://github.com/premieroctet/openchakra">
-            <Box as={DiGithubBadge} size={32} color="gray.200" />
-          </Link>
-          <Box lineHeight="shorter" color="white" fontSize="xs">
-            by{' '}
-            <Link isExternal href="https://premieroctet.com" color="teal.100">
-              Premier Octet
-            </Link>
-          </Box>
-        </Stack>
       </Flex>
     </DarkMode>
   )
