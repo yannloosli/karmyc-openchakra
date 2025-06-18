@@ -3,7 +3,6 @@ import { Box, Flex, Stack, Button } from '@chakra-ui/react'
 import { CheckCircleIcon } from '@chakra-ui/icons'
 import { FaBomb } from 'react-icons/fa'
 import { gridStyles } from '~components/editor/Editor'
-import { bugsnagClient } from '~utils/bugsnag'
 
 type ErrorBoundaryState = {
   hasError: boolean
@@ -18,7 +17,6 @@ export default class AppErrorBoundary extends Component<
   state = { hasError: false }
 
   static getDerivedStateFromError(error: any) {
-    bugsnagClient.notify(error)
     return { hasError: true }
   }
 
