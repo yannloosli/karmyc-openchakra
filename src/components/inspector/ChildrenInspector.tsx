@@ -1,11 +1,10 @@
 import React from 'react'
-import { useSelector } from 'react-redux'
-import { getSelectedComponentChildren } from '~core/selectors/components'
+import { useSelectedComponentChildren } from '~hooks/useKarmycStore'
 import ElementsList from '~components/inspector/elements-list/ElementsList'
 import useDispatch from '~hooks/useDispatch'
 
 const ChildrenInspector = () => {
-  const childrenComponent = useSelector(getSelectedComponentChildren)
+  const childrenComponent = useSelectedComponentChildren()
   const dispatch = useDispatch()
 
   const moveChildren = (fromIndex: number, toIndex: number) => {

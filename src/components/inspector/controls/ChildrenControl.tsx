@@ -3,14 +3,13 @@ import { Input } from '@chakra-ui/react'
 import useDispatch from '~hooks/useDispatch'
 import { useForm } from '~hooks/useForm'
 import usePropsSelector from '~hooks/usePropsSelector'
-import { useSelector } from 'react-redux'
-import { getInputTextFocused } from '~core/selectors/app'
+import { useInputTextFocused } from '~hooks/useKarmycStore'
 import FormControl from './FormControl'
 
 const ChildrenControl: React.FC = () => {
   const dispatch = useDispatch()
   const textInput = useRef<HTMLInputElement>(null)
-  const focusInput = useSelector(getInputTextFocused)
+  const focusInput = useInputTextFocused()
   const { setValueFromEvent } = useForm()
   const children = usePropsSelector('children')
   const onKeyUp = (event: KeyboardEvent) => {
@@ -38,7 +37,7 @@ const ChildrenControl: React.FC = () => {
         ref={textInput}
         onKeyUp={onKeyUp}
         onBlur={() => {
-          dispatch.app.toggleInputText(false)
+          dispatch.app.toggleInputText()
         }}
       />
     </FormControl>

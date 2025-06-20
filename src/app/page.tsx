@@ -6,24 +6,19 @@ import { AreaInitializer } from '~components/AreaInitializer'
 import { Box, ChakraProvider } from '@chakra-ui/react'
 import theme from '@chakra-ui/theme'
 import AppErrorBoundary from '~components/errorBoundaries/AppErrorBoundary'
-import { Provider as ReduxProvider } from 'react-redux'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { Global } from '@emotion/react'
 import Metadata from '~components/Metadata'
 import useShortcuts from '~hooks/useShortcuts'
-import Header from '~components/Header'
-
-
-
-import { getStore } from '~core/store-app'
+import { openChakraPlugin } from '~core/karmyc-plugin'
 
 // Composant wrapper pour gérer le rendu côté client
 function ClientOnlyApp({ isClient }: { isClient: boolean }) {
     useShortcuts()
 
     const karmycConfig = {
-        plugins: [],
+        plugins: [openChakraPlugin],
         initialAreas: [
             { id: 'area-1', type: 'sidebar-area', state: {}, role: AREA_ROLE.SELF },
             { id: 'area-2', type: 'editor-area', state: {}, role: AREA_ROLE.LEAD },
@@ -149,7 +144,6 @@ function ClientOnlyApp({ isClient }: { isClient: boolean }) {
 
 export default function HomePage() {
     const [isClient, setIsClient] = useState(false);
-    const storeRef = useRef<any | null>(null)
 
     useEffect(() => {
         setIsClient(true);
@@ -160,15 +154,5 @@ export default function HomePage() {
         return <div>Chargement...</div>;
     }
 
-
-    // Créer le store une seule fois
-    if (!storeRef.current) {
-        storeRef.current = getStore()
-    }
-
-    return (
-        <ReduxProvider store={storeRef.current}>
-            <ClientOnlyApp isClient={isClient} />
-        </ReduxProvider>
-    )
+    return <ClientOnlyApp isClient={isClient} />
 }

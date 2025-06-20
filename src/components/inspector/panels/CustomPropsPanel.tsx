@@ -1,7 +1,6 @@
 import React, { memo, useState, FormEvent, ChangeEvent, useRef } from 'react'
 import { useInspectorState } from '~contexts/inspector-context'
-import { getSelectedComponent } from '~core/selectors/components'
-import { useSelector } from 'react-redux'
+import { useSelectedComponent } from '~hooks/useKarmycStore'
 import { IoIosFlash } from 'react-icons/io'
 import {
   IconButton,
@@ -14,17 +13,17 @@ import {
   ButtonGroup,
 } from '@chakra-ui/react'
 import { EditIcon, SmallCloseIcon } from '@chakra-ui/icons'
-import useDispatch from '~hooks/useDispatch'
+import { useKarmycDispatch } from '~hooks/useKarmycStore'
 import { useForm } from '~hooks/useForm'
 
 const SEPARATOR = '='
 
 const CustomPropsPanel = () => {
-  const dispatch = useDispatch()
+  const dispatch = useKarmycDispatch()
   const inputRef = useRef<HTMLInputElement>(null)
 
   const activePropsRef = useInspectorState()
-  const { props, id } = useSelector(getSelectedComponent)
+  const { props, id } = useSelectedComponent()
   const { setValue } = useForm()
 
   const [quickProps, setQuickProps] = useState('')
@@ -42,77 +41,72 @@ const CustomPropsPanel = () => {
     propsName => !activeProps.includes(propsName),
   )
 
+  const onQuickPropsSubmit = (e: FormEvent) => {
+    e.preventDefault()
+    const [name, value] = quickProps.split(SEPARATOR)
+
+    if (!name || !value) {
+      setError(true)
+      return
+    }
+
+    setValue(name.trim(), value.trim())
+    setQuickProps('')
+    setError(false)
+  }
+
+  const onQuickPropsChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setQuickProps(e.target.value)
+    setError(false)
+  }
+
   return (
-    <>
-      <form
-        onSubmit={(event: FormEvent) => {
-          event.preventDefault()
-
-          const [name, value] = quickProps.split(SEPARATOR)
-
-          if (name && value) {
-            setValue(name, value)
-            setQuickProps('')
-            setError(false)
-          } else {
-            setError(true)
-          }
-        }}
-      >
-        <InputGroup mb={3} size="sm">
-          <InputRightElement>
-            <Box as={IoIosFlash} color="gray.300" />
-          </InputRightElement>
+    <Box>
+      <form onSubmit={onQuickPropsSubmit}>
+        <InputGroup size="sm">
           <Input
             ref={inputRef}
-            isInvalid={hasError}
+            placeholder="name=value"
             value={quickProps}
-            placeholder={`props${SEPARATOR}value`}
-            onChange={(event: ChangeEvent<HTMLInputElement>) =>
-              setQuickProps(event.target.value)
-            }
+            onChange={onQuickPropsChange}
+            isInvalid={hasError}
           />
+          <InputRightElement>
+            <IconButton
+              aria-label="Add prop"
+              icon={<IoIosFlash />}
+              size="sm"
+              type="submit"
+            />
+          </InputRightElement>
         </InputGroup>
       </form>
 
-      {customProps.map((propsName, i) => (
-        <Flex
-          key={propsName}
-          alignItems="center"
-          px={2}
-          bg={i % 2 === 0 ? 'white' : 'gray.50'}
-          fontSize="xs"
-          justifyContent="space-between"
-        >
-          <SimpleGrid width="100%" columns={2} spacing={1}>
-            <Box fontWeight="bold">{propsName}</Box>
-            <Box>{props[propsName]}</Box>
-          </SimpleGrid>
-
-          <ButtonGroup display="flex" size="xs" isAttached>
-            <IconButton
-              onClick={() => {
-                setQuickProps(`${propsName}=`)
-                if (inputRef.current) {
-                  inputRef.current.focus()
-                }
-              }}
-              variant="ghost"
-              size="xs"
-              aria-label="edit"
-              icon={<EditIcon path="" />}
-            />
-            <IconButton
-              onClick={() => onDelete(propsName)}
-              variant="ghost"
-              size="xs"
-              aria-label="delete"
-              icon={<SmallCloseIcon path="" />}
-            />
-          </ButtonGroup>
-        </Flex>
-      ))}
-    </>
+      <SimpleGrid columns={2} spacing={1} mt={2}>
+        {customProps.map(propsName => (
+          <Flex key={propsName} justify="space-between" align="center">
+            <Box fontSize="xs" color="gray.600">
+              {propsName}
+            </Box>
+            <ButtonGroup size="xs" isAttached>
+              <IconButton
+                aria-label="Edit prop"
+                icon={<EditIcon path="" />}
+                onClick={() => {
+                  setQuickProps(`${propsName}=${props[propsName]}`)
+                  inputRef.current?.focus()
+                }}
+              />
+              <IconButton
+                aria-label="Delete prop"
+                icon={<SmallCloseIcon path="" />}
+                onClick={() => onDelete(propsName)}
+              />
+            </ButtonGroup>
+          </Flex>
+        ))}
+      </SimpleGrid>
+    </Box>
   )
 }
 

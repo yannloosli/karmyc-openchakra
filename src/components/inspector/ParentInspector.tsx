@@ -1,11 +1,10 @@
 import React from 'react'
-import { useSelector } from 'react-redux'
-import { getSelectedComponentParent } from '~core/selectors/components'
+import { useSelectedComponentParent } from '~hooks/useKarmycStore'
 import ElementListItem from '~components/inspector/elements-list/ElementListItem'
 import useDispatch from '~hooks/useDispatch'
 
 const ParentInspector = () => {
-  const parentComponent = useSelector(getSelectedComponentParent)
+  const parentComponent = useSelectedComponentParent()
   const dispatch = useDispatch()
 
   const onSelect = () => {

@@ -1,9 +1,7 @@
-import { useDispatch as useReduxDispatch } from 'react-redux'
-import { RematchDispatch } from '@rematch/core'
-import models from '~core/models'
+import { useKarmycDispatch } from './useKarmycStore'
 
 const useDispatch = () => {
-  return useReduxDispatch() as RematchDispatch<typeof models>
+  return useKarmycDispatch()
 }
 
 export default useDispatch

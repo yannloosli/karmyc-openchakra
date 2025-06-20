@@ -1,8 +1,6 @@
 import React, { memo } from 'react'
-import { useSelector } from 'react-redux'
-
 import * as Chakra from '@chakra-ui/react'
-import { getComponentBy } from '~core/selectors/components'
+import { useComponentBy } from '~hooks/useKarmycStore'
 import ButtonPreview from '~components/editor/previews/ButtonPreview'
 import PreviewContainer from '~components/editor/PreviewContainer'
 import WithChildrenPreviewContainer from '~components/editor/WithChildrenPreviewContainer'
@@ -10,7 +8,7 @@ import WithChildrenPreviewContainer from '~components/editor/WithChildrenPreview
 const ComponentPreview: React.FC<{
   componentName: string
 }> = ({ componentName, ...forwardedProps }) => {
-  const component = useSelector(getComponentBy(componentName))
+  const component = useComponentBy(componentName)
   if (!component) {
     console.error(`ComponentPreview unavailable for component ${componentName}`)
   }

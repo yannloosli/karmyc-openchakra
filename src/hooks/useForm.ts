@@ -1,11 +1,10 @@
 import { ChangeEvent, useCallback } from 'react'
-import { useSelector } from 'react-redux'
 import useDispatch from './useDispatch'
-import { getSelectedComponentId } from '~core/selectors/components'
+import { useSelectedComponentId } from './useKarmycStore'
 
 export const useForm = () => {
   const dispatch = useDispatch()
-  const componentId = useSelector(getSelectedComponentId)
+  const componentId = useSelectedComponentId()
 
   const setValueFromEvent = ({
     target: { name, value },

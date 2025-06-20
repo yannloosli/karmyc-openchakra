@@ -1,14 +1,15 @@
 import { useDrop, DropTargetMonitor } from 'react-dnd'
+import { useCallback } from 'react'
 import { rootComponents } from '~utils/editor'
-import useDispatch from './useDispatch'
-import builder from '~core/models/composer/builder'
+import { useKarmycDispatch } from './useKarmycStore'
+import builder from '~utils/composer/builder'
 
 export const useDropComponent = (
   componentId: string,
   accept: (ComponentType | MetaComponentType)[] = rootComponents,
   canDrop: boolean = true,
 ) => {
-  const dispatch = useDispatch()
+  const dispatch = useKarmycDispatch()
 
   const [{ isOver }, drop] = useDrop({
     accept,

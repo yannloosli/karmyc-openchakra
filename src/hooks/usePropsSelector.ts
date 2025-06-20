@@ -1,5 +1,4 @@
-import { useSelector } from 'react-redux'
-import { RootState } from '~core/store'
+import { useSelectedComponent, usePropsForSelectedComponent } from './useKarmycStore'
 import { getDefaultFormProps } from '~utils/defaultProps'
 import { useInspectorUpdate } from '~contexts/inspector-context'
 import { useEffect } from 'react'
@@ -12,23 +11,22 @@ const usePropsSelector = (propsName: string) => {
     addActiveProps(propsName)
   }, [addActiveProps, propsName])
 
-  const value = useSelector((state: RootState) => {
-    const component =
-      state.components.present.components[state.components.present.selectedId]
-    const propsValue = component.props[propsName]
+  const component = useSelectedComponent()
+  const value = usePropsForSelectedComponent(propsName)
 
-    if (propsValue !== undefined) {
-      return propsValue
+  if (value !== undefined) {
+    return value
+  }
+
+  // Fallback pour les props par défaut
+  if (component) {
+    const defaultProps = getDefaultFormProps(component.type || 'Box')
+    if (defaultProps[propsName] !== undefined) {
+      return defaultProps[propsName]
     }
+  }
 
-    if (getDefaultFormProps(component.type)[propsName] !== undefined) {
-      return getDefaultFormProps(component.type)[propsName]
-    }
-
-    return ''
-  })
-
-  return value
+  return ''
 }
 
 export default usePropsSelector

@@ -3,25 +3,22 @@ import { Box, Text, Link } from '@chakra-ui/react'
 import { useDropComponent } from '~hooks/useDropComponent'
 import Split from 'react-split'
 import CodePanel from '~components/CodePanel'
-import { useSelector } from 'react-redux'
-import useDispatch from '~hooks/useDispatch'
-import { getComponents } from '~core/selectors/components'
-import { getShowLayout, getShowCode } from '~core/selectors/app'
+import { useComponents, useShowLayout, useShowCode, useKarmycDispatch } from '~hooks/useKarmycStore'
 import ComponentPreview from '~components/editor/ComponentPreview'
 
 export const gridStyles = {
-  backgroundImage:
-    'linear-gradient(to right, #d9e2e9 1px, transparent 1px),linear-gradient(to bottom, #d9e2e9 1px, transparent 1px);',
-  backgroundSize: '20px 20px',
-  bgColor: '#edf2f6',
-  p: 10,
-}
+    backgroundImage:
+      'linear-gradient(to right, #d9e2e9 1px, transparent 1px),linear-gradient(to bottom, #d9e2e9 1px, transparent 1px);',
+    backgroundSize: '20px 20px',
+    bgColor: '#edf2f6',
+    p: 10,
+  }
 
 const Editor: React.FC = () => {
-  const showCode = useSelector(getShowCode)
-  const showLayout = useSelector(getShowLayout)
-  const components = useSelector(getComponents)
-  const dispatch = useDispatch()
+  const showCode = useShowCode()
+  const showLayout = useShowLayout()
+  const components = useComponents()
+  const dispatch = useKarmycDispatch()
 
   const { drop } = useDropComponent('root')
   const isEmpty = !components.root.children.length

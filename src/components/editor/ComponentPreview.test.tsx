@@ -1,36 +1,40 @@
 import React from 'react'
 import { render } from '@testing-library/react'
-import { init } from '@rematch/core'
-import { Provider } from 'react-redux'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { ChakraProvider } from '@chakra-ui/react'
 import theme from '@chakra-ui/theme'
+import { KarmycCoreProvider, useKarmyc } from '@gamesberry/karmyc-core'
+import { openChakraPlugin } from '~core/karmyc-plugin'
 
 import ComponentPreview from './ComponentPreview'
-import { storeConfig } from '~core/store'
 
-function renderWithRedux(
+function renderWithKarmyc(
   components: React.ReactNode,
-  {
-    // @ts-ignore
-    initialState,
-    // @ts-ignore
-    store = init(storeConfig),
-  } = {},
 ) {
+  const karmycConfig = {
+    plugins: [openChakraPlugin],
+    initialAreas: [],
+    keyboardShortcutsEnabled: false,
+    builtInLayouts: [],
+    initialLayout: 'default',
+    resizableAreas: false,
+    manageableAreas: false,
+    multiScreen: false,
+  };
+
+  const karmyc = useKarmyc(karmycConfig);
+
   return {
     ...render(
       <ChakraProvider resetCSS theme={theme}>
         <DndProvider backend={HTML5Backend}>
-          <Provider store={store}>{components}</Provider>
+          <KarmycCoreProvider options={karmyc}>
+            {components}
+          </KarmycCoreProvider>
         </DndProvider>
       </ChakraProvider>,
     ),
-    // adding `store` to the returned utilities to allow us
-    // to reference it in our tests (just try to avoid using
-    // this to test implementation details).
-    store,
   }
 }
 
@@ -53,19 +57,14 @@ const componentsToTest = [
 ]
 
 test.each(componentsToTest)('Component Preview for %s', componentName => {
-  // const spy = jest.spyOn(global.console, 'error')
-  // @ts-ignore
-  const store = init(storeConfig)
-  store.dispatch.components.addComponent({
-    // @ts-ignore
+  // Ajouter un composant de test via le plugin Karmyc
+  const { actions } = require('~core/karmyc-plugin')
+  actions.addComponent({
     parentName: 'root',
     type: componentName,
     rootParentType: componentName,
     testId: 'test',
   })
 
-  // console.log(componentName, store.getState().components.present.components);
-  // @ts-ignore
-  renderWithRedux(<ComponentPreview componentName="test" />, { store })
-  // expect(spy).not.toHaveBeenCalled();
+  renderWithKarmyc(<ComponentPreview componentName="test" />)
 })

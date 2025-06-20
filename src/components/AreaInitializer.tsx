@@ -1,28 +1,123 @@
-import { useMemo, useState } from 'react';
-import { useToolsSlot } from '@gamesberry/karmyc-core';
-import { InspectorArea } from './areas/inspector-area';
-import { SidebarArea } from './areas/sidebar-area';
-import { EditorArea } from './areas/editor-area';
-import HeaderMenu from '~components/headerMenu/HeaderMenu'
-import { useSelector } from 'react-redux';
-import { getShowCode, getShowLayout } from '~core/selectors/app';
-import { Button, FormControl, FormLabel, LightMode, PopoverFooter, PopoverContent, Popover, Switch, PopoverTrigger, PopoverArrow, PopoverCloseButton, PopoverHeader, PopoverBody } from '@chakra-ui/react';
-import { Tooltip } from '@chakra-ui/react';
-import useDispatch from '~hooks/useDispatch';
-import { CheckIcon, ExternalLinkIcon, SmallCloseIcon } from '@chakra-ui/icons';
-import { FaReact } from 'react-icons/fa';
-import { SiTypescript } from 'react-icons/si';
+import React, { useEffect, useState } from 'react'
+import {
+    useRegisterAreaType,
+    useToolsSlot,
+    AREA_ROLE,
+} from '@gamesberry/karmyc-core'
+import { SidebarArea } from './areas/sidebar-area'
+import { EditorArea } from './areas/editor-area'
+import { InspectorArea } from './areas/inspector-area'
+import {
+    Button,
+    FormControl,
+    FormLabel,
+    Popover,
+    PopoverArrow,
+    PopoverBody,
+    PopoverCloseButton,
+    PopoverContent,
+    PopoverFooter,
+    PopoverHeader,
+    PopoverTrigger,
+    Switch,
+    LightMode,
+    Tooltip,
+} from '@chakra-ui/react'
+import { SmallCloseIcon, CheckIcon, ExternalLinkIcon } from '@chakra-ui/icons'
 import { buildParameters } from '~utils/codesandbox'
 import { generateCode } from '~utils/code'
-import { getComponents } from '~core/selectors/components'
+import { useShowCode, useComponents, useKarmycDispatch, useShowLayout } from '~hooks/useKarmycStore'
+import HeaderMenu from './headerMenu/HeaderMenu'
+import useDispatch from '~hooks/useDispatch'
+import { getShowLayout } from '../core/karmyc-plugin'
+
+// Composant séparé pour le switch du code panel
+const CodePanelSwitch = () => {
+    const showCode = useShowCode()
+    const dispatch = useKarmycDispatch()
+
+    return (
+        <FormControl display="flex" flexDirection="row" alignItems="center">
+            <FormLabel
+                color="gray.200"
+                fontSize="xs"
+                mr={2}
+                mb={0}
+                htmlFor="code"
+                pb={0}
+                whiteSpace="nowrap"
+            >
+                Code panel
+            </FormLabel>
+            <LightMode>
+                <Switch
+                    isChecked={showCode}
+                    id="code"
+                    colorScheme="teal"
+                    onChange={() => dispatch.app.toggleCodePanel()}
+                    size="sm"
+                />
+            </LightMode>
+        </FormControl>
+    )
+}
+
+// Composant séparé pour le bouton de reset
+const ResetButton = () => {
+    const dispatch = useKarmycDispatch()
+
+    return (
+        <Popover>
+            {({ onClose }) => (
+                <>
+                    <PopoverTrigger>
+                        <Button
+                            ml={4}
+                            rightIcon={<SmallCloseIcon />}
+                            size="xs"
+                            variant="unstyled"
+                        >
+                            Clear
+                        </Button>
+                    </PopoverTrigger>
+                    <LightMode>
+                        <PopoverContent zIndex={100} bg="white">
+                            <PopoverArrow />
+                            <PopoverCloseButton />
+                            <PopoverHeader>Are you sure?</PopoverHeader>
+                            <PopoverBody fontSize="sm">
+                                Do you really want to remove all components on the
+                                editor?
+                            </PopoverBody>
+                            <PopoverFooter display="flex" justifyContent="flex-end">
+                                <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    colorScheme="red"
+                                    rightIcon={<CheckIcon path="" />}
+                                    onClick={() => {
+                                        dispatch.components.reset()
+                                        if (onClose) {
+                                            onClose()
+                                        }
+                                    }}
+                                >
+                                    Yes, clear
+                                </Button>
+                            </PopoverFooter>
+                        </PopoverContent>
+                    </LightMode>
+                </>
+            )}
+        </Popover>
+    )
+}
 
 export const AreaInitializer = () => {
+    const { registerComponent: registerRootMenu } = useToolsSlot('app', 'top-outer')
+    const { registerComponent: registerRootStatus } = useToolsSlot('app', 'bottom-outer')
 
-    // const { registerComponent: registerTitleComponent } = useToolsSlot('apptitle', 'top-outer');
-    const { registerComponent: registerRootMenu } = useToolsSlot('app', 'top-outer');
-    const { registerComponent: registerRootStatus } = useToolsSlot('app', 'bottom-outer');
-
-    useMemo(() => {
+    useEffect(() => {
         registerRootMenu(
             () => <HeaderMenu />,
             { name: 'topOuterLeftSlot', type: 'menu' },
@@ -30,7 +125,7 @@ export const AreaInitializer = () => {
         );
         registerRootMenu(
             () => {
-                const showLayout = useSelector(getShowLayout)
+                const showLayout = useShowLayout()
                 const dispatch = useDispatch()
 
                 return (
@@ -77,89 +172,13 @@ export const AreaInitializer = () => {
             { order: 991, width: 'auto', alignment: 'right' }
         );
         registerRootMenu(
-            () => {
-                const showCode = useSelector(getShowCode)
-                const dispatch = useDispatch()
-
-                return (
-                    <FormControl display="flex" flexDirection="row" alignItems="center">
-                        <FormLabel
-                            color="gray.200"
-                            fontSize="xs"
-                            mr={2}
-                            mb={0}
-                            htmlFor="code"
-                            pb={0}
-                            whiteSpace="nowrap"
-                        >
-                            Code panel
-                        </FormLabel>
-                        <LightMode>
-                            <Switch
-                                isChecked={showCode}
-                                id="code"
-                                colorScheme="teal"
-                                onChange={() => dispatch.app.toggleCodePanel()}
-                                size="sm"
-                            />
-                        </LightMode>
-                    </FormControl>
-                )
-            },
+            () => <CodePanelSwitch />,
             { name: 'topOuterLayoutSlot', type: 'menu' },
             { order: 991, width: 'auto', alignment: 'left' }
         );
 
         registerRootStatus(
-            () => {
-                const dispatch = useDispatch()
-
-                return (
-                    <Popover>
-                        {({ onClose }) => (
-                            <>
-                                <PopoverTrigger>
-                                    <Button
-                                        ml={4}
-                                        rightIcon={<SmallCloseIcon />}
-                                        size="xs"
-                                        variant="unstyled"
-                                    >
-                                        Clear
-                                    </Button>
-                                </PopoverTrigger>
-                                <LightMode>
-                                    <PopoverContent zIndex={100} bg="white">
-                                        <PopoverArrow />
-                                        <PopoverCloseButton />
-                                        <PopoverHeader>Are you sure?</PopoverHeader>
-                                        <PopoverBody fontSize="sm">
-                                            Do you really want to remove all components on the
-                                            editor?
-                                        </PopoverBody>
-                                        <PopoverFooter display="flex" justifyContent="flex-end">
-                                            <Button
-                                                size="sm"
-                                                variant="ghost"
-                                                colorScheme="red"
-                                                rightIcon={<CheckIcon path="" />}
-                                                onClick={() => {
-                                                    dispatch.components.reset()
-                                                    if (onClose) {
-                                                        onClose()
-                                                    }
-                                                }}
-                                            >
-                                                Yes, clear
-                                            </Button>
-                                        </PopoverFooter>
-                                    </PopoverContent>
-                                </LightMode>
-                            </>
-                        )}
-                    </Popover>
-                )
-            },
+            () => <ResetButton />,
             { name: 'reset-button', type: 'status' },
             { order: 890, alignment: 'right', width: 'auto' }
         );
@@ -224,10 +243,8 @@ export const AreaInitializer = () => {
     );
 };
 
-
-
 const CodeSandboxButton = () => {
-    const components = useSelector(getComponents)
+    const components = useComponents()
     const [isLoading, setIsLoading] = useState(false)
 
     const exportToCodeSandbox = async (isTypeScript: boolean) => {
@@ -268,32 +285,29 @@ const CodeSandboxButton = () => {
                             <PopoverFooter display="flex" justifyContent="flex-end">
                                 <Button
                                     size="sm"
-                                    mr={2}
                                     variant="ghost"
-                                    colorScheme="orange"
-                                    rightIcon={<FaReact />}
-                                    onClick={async () => {
-                                        await exportToCodeSandbox(false)
+                                    colorScheme="blue"
+                                    mr={3}
+                                    onClick={() => {
+                                        exportToCodeSandbox(false)
                                         if (onClose) {
                                             onClose()
                                         }
                                     }}
                                 >
-                                    JSX
+                                    JavaScript
                                 </Button>
                                 <Button
                                     size="sm"
-                                    variant="ghost"
                                     colorScheme="blue"
-                                    rightIcon={<SiTypescript />}
-                                    onClick={async () => {
-                                        await exportToCodeSandbox(true)
+                                    onClick={() => {
+                                        exportToCodeSandbox(true)
                                         if (onClose) {
                                             onClose()
                                         }
                                     }}
                                 >
-                                    TSX
+                                    TypeScript
                                 </Button>
                             </PopoverFooter>
                         </PopoverContent>

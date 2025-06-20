@@ -1,7 +1,5 @@
 import useDispatch from './useDispatch'
-import { useSelector } from 'react-redux'
-import { ActionCreators as UndoActionCreators } from 'redux-undo'
-import { getSelectedComponent } from '~core/selectors/components'
+import { useSelectedComponent } from './useKarmycStore'
 import { useHotkeys } from 'react-hotkeys-hook'
 
 const keyMap = {
@@ -22,7 +20,7 @@ const hasNoSpecialKeyPressed = (event: KeyboardEvent | undefined) =>
 
 const useShortcuts = () => {
   const dispatch = useDispatch()
-  const selected = useSelector(getSelectedComponent)
+  const selected = useSelectedComponent()
 
   const deleteNode = (event: KeyboardEvent | undefined) => {
     if (event) {
@@ -50,7 +48,7 @@ const useShortcuts = () => {
       event.preventDefault()
     }
 
-    dispatch(UndoActionCreators.undo())
+    dispatch.undo()
   }
 
   const redo = (event: KeyboardEvent | undefined) => {
@@ -58,7 +56,7 @@ const useShortcuts = () => {
       event.preventDefault()
     }
 
-    dispatch(UndoActionCreators.redo())
+    dispatch.redo()
   }
 
   const onUnselect = () => {

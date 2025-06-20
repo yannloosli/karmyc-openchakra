@@ -1,12 +1,12 @@
 import { useRef, MouseEvent } from 'react'
-import { useSelector } from 'react-redux'
 import useDispatch from './useDispatch'
 import { useDrag } from 'react-dnd'
 import {
-  getIsSelectedComponent,
-  getIsHovered,
-} from '../core/selectors/components'
-import { getShowLayout, getFocusedComponent } from '../core/selectors/app'
+  useIsSelectedComponent,
+  useIsHovered,
+  useShowLayout,
+  useFocusedComponent,
+} from './useKarmycStore'
 
 export const useInteractive = (
   component: IComponent,
@@ -14,10 +14,10 @@ export const useInteractive = (
   withoutComponentProps = false,
 ) => {
   const dispatch = useDispatch()
-  const showLayout = useSelector(getShowLayout)
-  const isComponentSelected = useSelector(getIsSelectedComponent(component.id))
-  const isHovered = useSelector(getIsHovered(component.id))
-  const focusInput = useSelector(getFocusedComponent(component.id))
+  const showLayout = useShowLayout()
+  const isComponentSelected = useIsSelectedComponent(component.id)
+  const isHovered = useIsHovered(component.id)
+  const focusInput = useFocusedComponent(component.id)
 
   const [, drag] = useDrag({
     type: component.type || 'component',

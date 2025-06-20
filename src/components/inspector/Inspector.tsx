@@ -24,15 +24,14 @@ import Panels from '~components/inspector/panels/Panels'
 import { GoRepo, GoCode } from 'react-icons/go'
 import { FiTrash2 } from 'react-icons/fi'
 import { IoMdRefresh } from 'react-icons/io'
-import { useSelector } from 'react-redux'
 import useDispatch from '~hooks/useDispatch'
 import StylesPanel from '~components/inspector/panels/StylesPanel'
 import {
-  getSelectedComponent,
-  getComponents,
-  getSelectedComponentId,
-  getComponentNames,
-} from '~core/selectors/components'
+  useSelectedComponent,
+  useComponents,
+  useSelectedComponentId,
+  useComponentNames,
+} from '~hooks/useKarmycStore'
 import ActionButton from './ActionButton'
 import { generateComponentCode, formatCode } from '~utils/code'
 import useClipboard from '~hooks/useClipboard'
@@ -43,8 +42,8 @@ const CodeActionButton = memo(() => {
   const [isLoading, setIsLoading] = useState(false)
   const { onCopy, hasCopied } = useClipboard()
 
-  const selectedId = useSelector(getSelectedComponentId)
-  const components = useSelector(getComponents)
+  const selectedId = useSelectedComponentId()
+  const components = useComponents()
 
   const parentId = components[selectedId].parent
   const parent = { ...components[parentId] }
@@ -76,10 +75,10 @@ CodeActionButton.displayName = 'CodeActionButton'
 
 const Inspector = () => {
   const dispatch = useDispatch()
-  const component = useSelector(getSelectedComponent)
+  const component = useSelectedComponent()
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [componentName, onChangeComponentName] = useState('')
-  const componentsNames = useSelector(getComponentNames)
+  const componentsNames = useComponentNames()
 
   const { clearActiveProps } = useInspectorUpdate()
 
