@@ -12,6 +12,7 @@ const DragItem: React.FC<ComponentItemProps> = ({
   rootParentType,
 }) => {
   const [, drag] = useDrag({
+    type: type || 'component',
     item: { id: type, type, isMeta, rootParentType },
   })
 

@@ -26,7 +26,7 @@ type MenuItemLinkProps = MenuItemProps | LinkProps
 const MenuItemLink: React.FC<MenuItemLinkProps> = React.forwardRef(
   (props, ref: React.Ref<HTMLLinkElement>) => {
     // @ts-ignore
-    return <MenuItem ref={ref} as="a" {...props} />
+    return <MenuItem ref={ref} as="a" {...props}/>
   },
 )
 
@@ -51,21 +51,20 @@ const HeaderMenu = () => {
       <CustomMenuButton
         rightIcon={<ChevronDownIcon path="" />}
         size="xs"
-        variant="ghost"
+        variant='unstyled'
         colorScheme="gray"
       >
         Editor
       </CustomMenuButton>
       <Portal>
         <LightMode>
-          <MenuList bg="white" zIndex={999}>
+          <MenuList bg="white" zIndex={9999}>
             <ExportMenuItem />
             <ImportMenuItem />
 
             <MenuDivider />
 
             <MenuItemLink
-              isExternal
               href="https://chakra-ui.com/getting-started"
             >
               <Box mr={2} as={GoRepo} />
@@ -77,11 +76,11 @@ const HeaderMenu = () => {
             </MenuItemLink>
 
             <MenuDivider />
-            <MenuItemLink isExternal href="https://v0.openchakra.app">
+            <MenuItemLink href="https://v0.openchakra.app">
               <Box mr={2} as={GoArchive} />
               Chakra v0 Editor
             </MenuItemLink>
-            <MenuItemLink isExternal href="https://v1.openchakra.app">
+            <MenuItemLink href="https://v1.openchakra.app">
               <Box mr={2} as={GoArchive} />
               Chakra v1 Editor
             </MenuItemLink>

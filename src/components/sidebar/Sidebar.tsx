@@ -18,16 +18,15 @@ const Menu = () => {
   return (
     <DarkMode>
       <Box
-        maxH="calc(100vh - 3rem)"
         overflowY="auto"
         overflowX="visible"
         boxShadow="xl"
-        flex="0 0 14rem"
         m={0}
         p={0}
         as="menu"
         backgroundColor="#2e3748"
-        width="15rem"
+        w="100%"
+        h="100%"
       >
         <Box p={5} pb={1} position="sticky" w="100%" bgColor="#2e3748" top={0}>
           <InputGroup size="sm" mb={4}>

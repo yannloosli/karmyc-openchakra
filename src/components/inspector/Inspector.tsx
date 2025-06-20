@@ -115,7 +115,7 @@ const Inspector = () => {
 
   return (
     <>
-      <Box bg="white">
+      <Box bg="white" w="100%">
         <Box
           fontWeight="semibold"
           fontSize="md"
@@ -125,7 +125,7 @@ const Inspector = () => {
           boxShadow="sm"
           bg="yellow.100"
           display="flex"
-          justifyContent="space-between"
+          justifyContent="flex-start"
           flexDir="column"
         >
           {isRoot ? 'Document' : type}

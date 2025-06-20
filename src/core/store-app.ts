@@ -3,7 +3,6 @@ import { combineReducers } from 'redux'
 import undoable from 'redux-undo'
 import { persistReducer, persistStore } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
-import { createWrapper } from 'next-redux-wrapper'
 
 import { ComponentsStateWithUndo } from './models/components'
 import { AppState } from './models/app'
@@ -27,7 +26,7 @@ const persistConfig = {
 
 const persistPlugin = {
   onStoreCreated(store: any) {
-    if (process.browser) {
+    if (typeof window !== 'undefined') {
       persistStore(store)
     }
   },
@@ -53,9 +52,14 @@ export const storeConfig = {
   plugins: [persistPlugin],
 }
 
-// @ts-ignore
 export const makeStore = () => init(storeConfig)
 
-export const wrapper = createWrapper<ReturnType<typeof makeStore>>(makeStore, {
-  debug: process.env.NODE_ENV === 'development',
-})
+// Store singleton pour l'App Router
+let store: ReturnType<typeof makeStore> | null = null
+
+export const getStore = () => {
+  if (!store) {
+    store = makeStore()
+  }
+  return store
+} 

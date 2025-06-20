@@ -16,7 +16,7 @@ import {
   Portal,
   useTheme,
 } from '@chakra-ui/react'
-import ColorPicker from 'coloreact'
+import { Sketch } from '@uiw/react-color'
 import HuesPickerControl from './HuesPickerControl'
 import { useForm } from '~hooks/useForm'
 import omit from 'lodash/omit'
@@ -76,7 +76,7 @@ const ColorPickerControl = (props: ColorPickerPropType) => {
           )}
         </PopoverTrigger>
         <Portal>
-          <PopoverContent width="200px">
+          <PopoverContent width="220px">
             <PopoverArrow />
             <PopoverBody>
               {props.withFullColor ? (
@@ -109,19 +109,20 @@ const ColorPickerControl = (props: ColorPickerPropType) => {
                     </TabPanel>
 
                     <TabPanel p={0}>
-                      <Box position="relative" height="150px">
-                        <ColorPicker
+                      <Box position="relative" height="200px">
+                        <Sketch
                           color={props.gradient ? props.gradientColor : value}
-                          onChange={(color: any) => {
+                          onChange={(color) => {
                             props.gradient
                               ? props.updateGradient!(
-                                  `#${color.hex}`,
+                                  color.hex,
                                   props.index!,
                                 )
-                              : setValue(props.name, `#${color.hex}`)
+                              : setValue(props.name, color.hex)
                           }}
+                          presetColors={[]}
+                          disableAlpha={true}
                         />
-                        );
                       </Box>
                     </TabPanel>
                   </TabPanels>

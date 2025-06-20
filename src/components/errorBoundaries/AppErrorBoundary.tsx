@@ -1,3 +1,5 @@
+'use client'
+
 import React, { Component } from 'react'
 import { Box, Flex, Stack, Button } from '@chakra-ui/react'
 import { CheckCircleIcon } from '@chakra-ui/icons'

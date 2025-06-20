@@ -1,5 +1,5 @@
 import React, { useRef } from 'react'
-import { XYCoord, useDrop, DragObjectWithType, useDrag } from 'react-dnd'
+import { XYCoord, useDrop, useDrag } from 'react-dnd'
 import ElementListItem from './ElementListItem'
 
 interface Props extends Pick<IComponent, 'type' | 'id'> {
@@ -26,7 +26,7 @@ const ElementListItemDraggable: React.FC<Props> = ({
   const ref = useRef<HTMLDivElement>(null)
   const [, drop] = useDrop({
     accept: ITEM_TYPE,
-    hover(item: DragObjectWithType, monitor) {
+    hover(item: any, monitor) {
       if (!ref.current) {
         return
       }
@@ -55,6 +55,7 @@ const ElementListItemDraggable: React.FC<Props> = ({
     },
   })
   const [{ isDragging }, drag] = useDrag({
+    type: ITEM_TYPE,
     item: { type: ITEM_TYPE, id, index },
     collect: monitor => ({
       isDragging: monitor.isDragging(),

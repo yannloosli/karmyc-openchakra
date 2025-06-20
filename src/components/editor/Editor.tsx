@@ -1,7 +1,7 @@
 import React, { memo } from 'react'
 import { Box, Text, Link } from '@chakra-ui/react'
 import { useDropComponent } from '~hooks/useDropComponent'
-import SplitPane from 'react-split-pane'
+import Split from 'react-split'
 import CodePanel from '~components/CodePanel'
 import { useSelector } from 'react-redux'
 import useDispatch from '~hooks/useDispatch'
@@ -53,7 +53,7 @@ const Editor: React.FC = () => {
       justifyContent="center"
       alignItems="center"
       overflow="auto"
-      ref={drop}
+      ref={drop as any}
       position="relative"
       flexDirection="column"
       onClick={onSelectBackground}
@@ -86,20 +86,21 @@ const Editor: React.FC = () => {
   }
 
   return (
-    // @ts-ignore
-    <SplitPane
-      style={{ overflow: 'auto' }}
-      defaultSize="50%"
-      resizerStyle={{
+    <Split
+      direction="vertical"
+      sizes={[50, 50]}
+      minSize={200}
+      style={{ height: '100%', overflow: 'auto' }}
+      gutterStyle={() => ({
+        backgroundColor: 'rgba(1, 22, 39, 0.21)',
         border: '3px solid rgba(1, 22, 39, 0.21)',
-        zIndex: 20,
+        zIndex: '20',
         cursor: 'row-resize',
-      }}
-      split="horizontal"
+      })}
     >
       {Playground}
       <CodePanel />
-    </SplitPane>
+    </Split>
   )
 }
 
