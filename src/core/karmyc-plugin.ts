@@ -71,6 +71,8 @@ const SPACE_ID = 'openchakra-editor'
 // Système de réactivité
 type StateChangeCallback = (state: RootState) => void
 const stateChangeCallbacks: StateChangeCallback[] = []
+let isNotifying = false
+let pendingNotifications: RootState[] = []
 
 export const subscribeToStateChanges = (callback: StateChangeCallback) => {
   stateChangeCallbacks.push(callback)
@@ -83,7 +85,30 @@ export const subscribeToStateChanges = (callback: StateChangeCallback) => {
 }
 
 const notifyStateChange = (state: RootState) => {
-  stateChangeCallbacks.forEach(callback => callback(state))
+  if (isNotifying) {
+    // Si une notification est déjà en cours, ajouter à la queue
+    pendingNotifications.push(state)
+    return
+  }
+  
+  isNotifying = true
+  
+  // Utiliser requestAnimationFrame pour éviter les mises à jour pendant le rendu
+  requestAnimationFrame(() => {
+    try {
+      stateChangeCallbacks.forEach(callback => callback(state))
+    } finally {
+      isNotifying = false
+      
+      // Traiter les notifications en attente
+      if (pendingNotifications.length > 0) {
+        const nextState = pendingNotifications.shift()
+        if (nextState) {
+          notifyStateChange(nextState)
+        }
+      }
+    }
+  })
 }
 
 // Fonctions de persistance

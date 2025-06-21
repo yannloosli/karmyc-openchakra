@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect } from 'react'
+import { useCallback, useState, useEffect, useMemo } from 'react'
 import { 
   actions, 
   getState, 
@@ -86,13 +86,26 @@ export const useKarmycDispatch = () => {
 
 // Hook pour remplacer useSelector avec réactivité
 export const useKarmycSelector = <T>(selector: () => T): T => {
-  const [value, setValue] = useState<T>(selector)
+  // Utiliser useMemo pour éviter les recalculs inutiles et les appels pendant le rendu
+  const initialValue = useMemo(() => selector(), [])
+  const [value, setValue] = useState<T>(initialValue)
 
   useEffect(() => {
+    let isSubscribed = true
+    
     const unsubscribe = subscribeToStateChanges(() => {
-      setValue(selector())
+      // Utiliser requestAnimationFrame pour éviter les mises à jour pendant le rendu
+      requestAnimationFrame(() => {
+        if (isSubscribed) {
+          setValue(selector())
+        }
+      })
     })
-    return unsubscribe
+    
+    return () => {
+      isSubscribed = false
+      unsubscribe()
+    }
   }, [selector])
 
   return value

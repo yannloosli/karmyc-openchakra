@@ -3,8 +3,8 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { AREA_ROLE, KarmycNextWrapper, Karmyc, useKarmyc, Tools, TOOLBAR_HEIGHT } from '@gamesberry/karmyc-core'
 import { AreaInitializer } from '~components/AreaInitializer'
-import { Box, ChakraProvider } from '@chakra-ui/react'
-import theme from '@chakra-ui/theme'
+import { Box } from '@chakra-ui/react'
+import { Provider } from '~components/ui/provider'
 import AppErrorBoundary from '~components/errorBoundaries/AppErrorBoundary'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
@@ -121,7 +121,7 @@ function ClientOnlyApp({ isClient }: { isClient: boolean }) {
             <Metadata />
             <KarmycNextWrapper config={karmyc} isClient={isClient}>
                 <AreaInitializer />
-                <ChakraProvider resetCSS theme={theme}>
+                <Provider>
                     <Global
                         styles={() => ({
                             html: { minWidth: '860px', backgroundColor: '#1a202c' },
@@ -136,7 +136,7 @@ function ClientOnlyApp({ isClient }: { isClient: boolean }) {
                             </AppErrorBoundary>
                         </DndProvider>
                     </Box>
-                </ChakraProvider>
+                </Provider>
             </KarmycNextWrapper>
         </>
     )

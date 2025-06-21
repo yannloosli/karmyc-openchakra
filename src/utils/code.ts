@@ -199,14 +199,14 @@ import {
 } from "@chakra-ui/react";${
     iconImports.length
       ? `
-import { ${iconImports.join(',')} } from "@chakra-ui/icons";`
+import { ${iconImports.join(',')} } from "lucide-react";`
       : ''
   }
 
 ${componentsCodes}
 
 const App = () => (
-  <ChakraProvider resetCSS>
+  <ChakraProvider>
     ${code}
   </ChakraProvider>
 );

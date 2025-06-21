@@ -1,5 +1,5 @@
 import React, { memo } from 'react'
-import { IconButton, ButtonGroup, useTheme } from '@chakra-ui/react'
+import { IconButton, ButtonGroup, useChakraContext } from '@chakra-ui/react'
 import ColorsControl from '~components/inspector/controls/ColorsControl'
 import { GoBold, GoItalic } from 'react-icons/go'
 import {
@@ -16,7 +16,7 @@ import usePropsSelector from '~hooks/usePropsSelector'
 
 const TextPanel = () => {
   const { setValue, setValueFromEvent } = useForm()
-  const theme = useTheme()
+  const { tokens } = useChakraContext()
 
   const fontWeight = usePropsSelector('fontWeight')
   const fontStyle = usePropsSelector('fontStyle')
@@ -31,7 +31,6 @@ const TextPanel = () => {
         <IconButton
           mr={1}
           aria-label="bold"
-          icon={<GoBold />}
           onClick={() => {
             setValue('fontWeight', fontWeight ? null : 'bold')
           }}
@@ -39,11 +38,10 @@ const TextPanel = () => {
           colorScheme={fontWeight ? 'whatsapp' : 'gray'}
           variant={fontWeight ? 'solid' : 'outline'}
         >
-          Bold
+          <GoBold />
         </IconButton>
         <IconButton
           aria-label="italic"
-          icon={<GoItalic />}
           onClick={() => {
             setValue('fontStyle', fontStyle === 'italic' ? null : 'italic')
           }}
@@ -51,61 +49,65 @@ const TextPanel = () => {
           colorScheme={fontStyle === 'italic' ? 'whatsapp' : 'gray'}
           variant={fontStyle === 'italic' ? 'solid' : 'outline'}
         >
-          Italic
+          <GoItalic />
         </IconButton>
       </FormControl>
 
       <FormControl label="Text align">
-        <ButtonGroup size="xs" isAttached>
+        <ButtonGroup size="xs" attached>
           <IconButton
             aria-label="bold"
-            icon={<MdFormatAlignLeft />}
             onClick={() => {
               setValue('textAlign', 'left')
             }}
             colorScheme={textAlign === 'left' ? 'whatsapp' : 'gray'}
             variant={textAlign === 'left' ? 'solid' : 'outline'}
-          />
+          >
+            <MdFormatAlignLeft />
+          </IconButton>
 
           <IconButton
             aria-label="italic"
-            icon={<MdFormatAlignCenter />}
             onClick={() => {
               setValue('textAlign', 'center')
             }}
             colorScheme={textAlign === 'center' ? 'whatsapp' : 'gray'}
             variant={textAlign === 'center' ? 'solid' : 'outline'}
-          />
+          >
+            <MdFormatAlignCenter />
+          </IconButton>
 
           <IconButton
             aria-label="italic"
-            icon={<MdFormatAlignRight />}
             onClick={() => {
               setValue('textAlign', 'right')
             }}
             colorScheme={textAlign === 'right' ? 'whatsapp' : 'gray'}
             variant={textAlign === 'right' ? 'solid' : 'outline'}
-          />
+          >
+            <MdFormatAlignRight />
+          </IconButton>
 
           <IconButton
             aria-label="italic"
-            icon={<MdFormatAlignJustify />}
             onClick={() => {
               setValue('textAlign', 'justify')
             }}
             colorScheme={textAlign === 'justify' ? 'whatsapp' : 'gray'}
             variant={textAlign === 'justify' ? 'solid' : 'outline'}
-          />
+          >
+            <MdFormatAlignJustify />
+          </IconButton>
         </ButtonGroup>
       </FormControl>
 
-      <FormControl label="Font size" htmlFor="fontSize">
+      <FormControl label="Font size">
         <InputSuggestion
           value={fontSize}
           handleChange={setValueFromEvent}
           name="fontSize"
         >
-          {Object.keys(theme.fontSizes).map(option => (
+          {Object.keys(tokens.getCategoryValues('fontSizes')).map(option => (
             <ComboboxOption key={option} value={option} />
           ))}
         </InputSuggestion>
@@ -113,25 +115,25 @@ const TextPanel = () => {
 
       <ColorsControl withFullColor enableHues name="color" label="Color" />
 
-      <FormControl label="Line height" htmlFor="lineHeight">
+      <FormControl label="Line height">
         <InputSuggestion
           value={lineHeight}
           handleChange={setValueFromEvent}
           name="lineHeight"
         >
-          {Object.keys(theme.lineHeights).map(option => (
+          {Object.keys(tokens.getCategoryValues('lineHeights')).map(option => (
             <ComboboxOption key={option} value={option} />
           ))}
         </InputSuggestion>
       </FormControl>
 
-      <FormControl label="Letter spacing" htmlFor="letterSpacing">
+      <FormControl label="Letter spacing">
         <InputSuggestion
           value={letterSpacing}
           handleChange={setValueFromEvent}
           name="letterSpacing"
         >
-          {Object.keys(theme.letterSpacings).map(option => (
+          {Object.keys(tokens.getCategoryValues('letterSpacings')).map(option => (
             <ComboboxOption key={option} value={option} />
           ))}
         </InputSuggestion>

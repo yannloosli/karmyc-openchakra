@@ -1,4 +1,5 @@
 import { generateComponentCode, generateCode, formatCode } from './code'
+import { Phone } from 'lucide-react'
 
 const componentFixtures: IComponents = {
   root: {
@@ -106,11 +107,11 @@ export default App
 
     expect(code).toEqual(`import React from 'react'
 import { ChakraProvider, Box, Button } from '@chakra-ui/react'
-import { PhoneIcon } from '@chakra-ui/icons'
+import { Phone } from 'lucide-react'
 
 const MyBox = () => (
   <Box bg="whatsapp.500">
-    <Button leftIcon={<PhoneIcon />} />
+    <Button leftIcon={<Phone />} />
   </Box>
 )
 

@@ -1,19 +1,16 @@
 import React, { memo } from 'react'
 import {
-  FormControl,
-  FormLabel,
-  Input,
-  SimpleGrid,
-  InputGroup,
-  InputLeftElement,
   Box,
+  Input,
+  VStack,
+  HStack,
 } from '@chakra-ui/react'
 import {
-  ArrowBackIcon,
-  ArrowForwardIcon,
-  ArrowUpIcon,
-  ChevronDownIcon,
-} from '@chakra-ui/icons'
+  ArrowLeft,
+  ArrowRight,
+  ArrowUp,
+  ChevronDown,
+} from 'lucide-react'
 import { useForm } from '~hooks/useForm'
 import usePropsSelector from '~hooks/usePropsSelector'
 
@@ -49,28 +46,25 @@ const PaddingPanel = ({ type }: PaddingPanelPropsType) => {
 
   return (
     <Box mb={4}>
-      <FormControl>
-        <FormLabel fontSize="xs" htmlFor="width" textTransform="capitalize">
-          {type}
-        </FormLabel>
+      <Box fontSize="xs" textTransform="capitalize" mb={2}>
+        {type}
+      </Box>
 
-        <InputGroup size="sm">
-          <Input
-            mb={1}
-            placeholder="All"
-            size="sm"
-            type="text"
-            name={ATTRIBUTES[type].all}
-            value={all || ''}
-            onChange={setValueFromEvent}
-          />
-        </InputGroup>
+      <VStack gap={1}>
+        <Input
+          placeholder="All"
+          size="sm"
+          type="text"
+          name={ATTRIBUTES[type].all}
+          value={all || ''}
+          onChange={setValueFromEvent}
+        />
 
-        <SimpleGrid columns={2} spacing={1}>
-          <InputGroup size="sm">
-            <InputLeftElement>
-              <ArrowBackIcon path="" fontSize="md" color="gray.300" />
-            </InputLeftElement>
+        <HStack gap={1}>
+          <Box position="relative" flex={1}>
+            <Box position="absolute" left={2} top="50%" transform="translateY(-50%)" zIndex={1}>
+              <ArrowLeft size={16} color="#A0AEC0" />
+            </Box>
             <Input
               placeholder="left"
               size="sm"
@@ -79,13 +73,14 @@ const PaddingPanel = ({ type }: PaddingPanelPropsType) => {
               value={left || ''}
               onChange={setValueFromEvent}
               autoComplete="off"
+              pl={8}
             />
-          </InputGroup>
+          </Box>
 
-          <InputGroup size="sm">
-            <InputLeftElement>
-              <ArrowForwardIcon path="" fontSize="md" color="gray.300" />
-            </InputLeftElement>
+          <Box position="relative" flex={1}>
+            <Box position="absolute" left={2} top="50%" transform="translateY(-50%)" zIndex={1}>
+              <ArrowRight size={16} color="#A0AEC0" />
+            </Box>
             <Input
               placeholder="right"
               size="sm"
@@ -94,13 +89,16 @@ const PaddingPanel = ({ type }: PaddingPanelPropsType) => {
               name={ATTRIBUTES[type].right}
               onChange={setValueFromEvent}
               autoComplete="off"
+              pl={8}
             />
-          </InputGroup>
+          </Box>
+        </HStack>
 
-          <InputGroup size="sm">
-            <InputLeftElement>
-              <ArrowUpIcon path="" fontSize="md" color="gray.300" />
-            </InputLeftElement>
+        <HStack gap={1}>
+          <Box position="relative" flex={1}>
+            <Box position="absolute" left={2} top="50%" transform="translateY(-50%)" zIndex={1}>
+              <ArrowUp size={16} color="#A0AEC0" />
+            </Box>
             <Input
               placeholder="top"
               size="sm"
@@ -109,13 +107,14 @@ const PaddingPanel = ({ type }: PaddingPanelPropsType) => {
               name={ATTRIBUTES[type].top}
               onChange={setValueFromEvent}
               autoComplete="off"
+              pl={8}
             />
-          </InputGroup>
+          </Box>
 
-          <InputGroup size="sm">
-            <InputLeftElement>
-              <ChevronDownIcon path="" fontSize="md" color="gray.300" />
-            </InputLeftElement>
+          <Box position="relative" flex={1}>
+            <Box position="absolute" left={2} top="50%" transform="translateY(-50%)" zIndex={1}>
+              <ChevronDown size={16} color="#A0AEC0" />
+            </Box>
             <Input
               placeholder="bottom"
               size="sm"
@@ -124,10 +123,11 @@ const PaddingPanel = ({ type }: PaddingPanelPropsType) => {
               name={ATTRIBUTES[type].bottom}
               onChange={setValueFromEvent}
               autoComplete="off"
+              pl={8}
             />
-          </InputGroup>
-        </SimpleGrid>
-      </FormControl>
+          </Box>
+        </HStack>
+      </VStack>
     </Box>
   )
 }

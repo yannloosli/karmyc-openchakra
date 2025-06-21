@@ -2,8 +2,8 @@ import { useComponents } from '~hooks/useKarmycStore'
 import { usePersistState, useFullState } from '~hooks/useKarmycStore'
 import { generateCode } from '~utils/code'
 import { buildParameters } from '~utils/codesandbox'
-import { Box, Button, Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
-import { ChevronDownIcon } from '@chakra-ui/icons'
+import { Box, Button, VStack, Separator } from '@chakra-ui/react'
+import { Download, ExternalLink, Save, Upload, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 const ExportMenuItem = () => {
@@ -67,21 +67,72 @@ const ExportMenuItem = () => {
   }
 
   return (
-    <Menu>
-      <MenuButton as={Button} rightIcon={<ChevronDownIcon />} isLoading={isLoading}>
-        Export
-      </MenuButton>
-      <MenuList>
-        <MenuItem onClick={handleExportCode}>Export Code</MenuItem>
-        <MenuItem onClick={handleExportToCodeSandbox}>Export to CodeSandbox</MenuItem>
-        <Box borderTop="1px solid" borderColor="gray.200" my={2} />
-        <MenuItem onClick={handleSaveToSpace}>Save to Space</MenuItem>
-        <MenuItem onClick={handleLoadFromSpace}>Load from Space</MenuItem>
-        <MenuItem onClick={handleClearStorage} color="red.500">
-          Clear Storage
-        </MenuItem>
-      </MenuList>
-    </Menu>
+    <VStack align="stretch" gap={1}>
+      <Button
+        onClick={handleExportCode}
+        disabled={isLoading}
+        variant="ghost"
+        size="sm"
+        justifyContent="flex-start"
+        h="auto"
+        py={2}
+        display={'flex'}
+        flexDirection={'row'}
+      >
+        <Download size={16} style={{ marginRight: '8px' }} />
+        Export Code
+      </Button>
+      <Button
+        onClick={handleExportToCodeSandbox}
+        disabled={isLoading}
+        variant="ghost"
+        size="sm"
+        justifyContent="flex-start"
+        h="auto"
+        py={2}
+      >
+        <ExternalLink size={16} style={{ marginRight: '8px' }} />
+        Export to CodeSandbox
+      </Button>
+      
+      <Separator />
+      
+      <Button
+        onClick={handleSaveToSpace}
+        variant="ghost"
+        size="sm"
+        justifyContent="flex-start"
+        h="auto"
+        py={2}
+      >
+        <Save size={16} style={{ marginRight: '8px' }} />
+        Save to Space
+      </Button>
+      <Button
+        onClick={handleLoadFromSpace}
+        variant="ghost"
+        size="sm"
+        justifyContent="flex-start"
+        h="auto"
+        py={2}
+      >
+        <Upload size={16} style={{ marginRight: '8px' }} />
+        Load from Space
+      </Button>
+      <Button
+        onClick={handleClearStorage}
+        variant="ghost"
+        size="sm"
+        justifyContent="flex-start"
+        h="auto"
+        py={2}
+        color="red.500"
+        _hover={{ bg: 'red.50' }}
+      >
+        <Trash2 size={16} style={{ marginRight: '8px' }} />
+        Clear Storage
+      </Button>
+    </VStack>
   )
 }
 

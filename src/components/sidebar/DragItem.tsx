@@ -1,7 +1,7 @@
 import React from 'react'
 import { useDrag } from 'react-dnd'
 import { Text, Box } from '@chakra-ui/react'
-import { DragHandleIcon } from '@chakra-ui/icons'
+import { GripVertical } from 'lucide-react'
 
 const DragItem: React.FC<ComponentItemProps> = ({
   type,
@@ -51,7 +51,7 @@ const DragItem: React.FC<ComponentItemProps> = ({
       alignItems="center"
       {...boxProps}
     >
-      <DragHandleIcon path="" fontSize="xs" mr={2} />
+      <GripVertical size={16} style={{ marginRight: 8 }} />
       <Text letterSpacing="wide" fontSize="sm" textTransform="capitalize">
         {label}
       </Text>

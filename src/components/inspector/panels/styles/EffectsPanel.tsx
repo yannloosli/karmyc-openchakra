@@ -3,10 +3,7 @@ import FormControl from '~components/inspector/controls/FormControl'
 import { useForm } from '~hooks/useForm'
 import usePropsSelector from '~hooks/usePropsSelector'
 import {
-  SliderTrack,
-  SliderFilledTrack,
   Slider,
-  SliderThumb,
 } from '@chakra-ui/react'
 import TextControl from '~components/inspector/controls/TextControl'
 
@@ -21,17 +18,20 @@ const EffectsPanel = () => {
   return (
     <>
       <FormControl label="Opacity">
-        <Slider
+        <Slider.Root
           min={1}
-          onChange={(value: any) => setValue('opacity', value / 100)}
-          value={normalizedOpacity}
+          max={100}
+          onValueChange={(details: { value: number[] }) => setValue('opacity', details.value[0] / 100)}
+          value={[normalizedOpacity]}
           mr={2}
         >
-          <SliderTrack>
-            <SliderFilledTrack />
-          </SliderTrack>
-          <SliderThumb />
-        </Slider>
+          <Slider.Control>
+            <Slider.Track>
+              <Slider.Range />
+            </Slider.Track>
+            <Slider.Thumbs />
+          </Slider.Control>
+        </Slider.Root>
       </FormControl>
 
       <TextControl name="boxShadow" label="Box Shadow" />

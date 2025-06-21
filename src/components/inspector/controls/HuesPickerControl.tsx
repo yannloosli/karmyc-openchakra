@@ -1,9 +1,6 @@
 import React, { useState } from 'react'
 import {
   Grid,
-  SliderTrack,
-  SliderFilledTrack,
-  SliderThumb,
   Box,
   Slider,
 } from '@chakra-ui/react'
@@ -66,25 +63,25 @@ const HuesPickerControl = (props: HuesPickerPropType) => {
 
       {props.enableHues && (
         <>
-          <Slider
-            onChange={value => {
-              value = value === 0 ? 50 : value
-              setHue(value)
+          <Slider.Root
+            onValueChange={(value: number[]) => {
+              const newHue = value[0] === 0 ? 50 : value[0]
+              setHue(newHue)
             }}
             min={0}
             max={900}
             step={100}
-            value={hue}
+            value={[hue]}
           >
-            <SliderTrack>
-              <SliderFilledTrack />
-            </SliderTrack>
-            <SliderThumb boxSize={8}>
+            <Slider.Track>
+              <Slider.Range />
+            </Slider.Track>
+            <Slider.Thumb>
               <Box borderRadius="full" fontSize="xs">
                 {hue}
               </Box>
-            </SliderThumb>
-          </Slider>
+            </Slider.Thumb>
+          </Slider.Root>
         </>
       )}
     </>

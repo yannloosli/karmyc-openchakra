@@ -1,51 +1,42 @@
-import React, { ReactNode, memo } from 'react'
-import {
-  FormLabel,
-  FormControl as ChakraFormControl,
-  Grid,
-  Box,
-} from '@chakra-ui/react'
+import React from 'react'
+import { Box, Flex, Text } from '@chakra-ui/react'
 
-type FormControlPropType = {
-  label: ReactNode
-  children: ReactNode
-  htmlFor?: string
-  hasColumn?: boolean
+interface FormControlProps {
+  label?: string | React.ReactNode
+  children: React.ReactNode
+  isInvalid?: boolean
+  isRequired?: boolean
+  isDisabled?: boolean
 }
 
-const FormControl: React.FC<FormControlPropType> = ({
+const FormControl: React.FC<FormControlProps> = ({
   label,
-  htmlFor,
   children,
-  hasColumn,
-}) => (
-  <ChakraFormControl
-    mb={3}
-    as={Grid}
-    display="flex"
-    alignItems="center"
-    justifyItems="center"
-  >
-    <FormLabel
-      p={0}
-      mr={2}
-      color="gray.500"
-      lineHeight="1rem"
-      width={hasColumn ? '2.5rem' : '90px'}
-      fontSize="xs"
-      htmlFor={htmlFor}
-    >
-      {label}
-    </FormLabel>
-    <Box
-      display="flex"
-      alignItems="center"
-      justifyItems="center"
-      width={hasColumn ? '30px' : '130px'}
-    >
-      {children}
-    </Box>
-  </ChakraFormControl>
-)
+  isInvalid,
+  isRequired,
+  isDisabled,
+}) => {
+  return (
+    <Flex mb={4} direction="row" alignItems="center">
+      {label && (
+        <Text
+          as="label"
+          fontSize="xs"
+          fontWeight="bold"
+          color={isInvalid ? 'red.500' : 'gray.700'}
+          mb={2}
+          mr={2}
+          display="block"
+        >
+          {label}
+          {isRequired && <Text as="span" color="red.500" ml={1}>*</Text>}
+        </Text>
+      )}
+      <Box opacity={isDisabled ? 0.6 : 1} pointerEvents={isDisabled ? 'none' : 'auto'}>
+        {children}
+      </Box>
+    </Flex>
+  )
+}
 
-export default memo(FormControl)
+export default FormControl

@@ -9,21 +9,14 @@ import { EditorArea } from './areas/editor-area'
 import { InspectorArea } from './areas/inspector-area'
 import {
     Button,
-    FormControl,
-    FormLabel,
+    Field,
     Popover,
-    PopoverArrow,
-    PopoverBody,
-    PopoverCloseButton,
-    PopoverContent,
-    PopoverFooter,
-    PopoverHeader,
-    PopoverTrigger,
+    Portal,
     Switch,
-    LightMode,
     Tooltip,
+    Text,
 } from '@chakra-ui/react'
-import { SmallCloseIcon, CheckIcon, ExternalLinkIcon } from '@chakra-ui/icons'
+import { X, Check, ExternalLink } from 'lucide-react'
 import { buildParameters } from '~utils/codesandbox'
 import { generateCode } from '~utils/code'
 import { useShowCode, useComponents, useKarmycDispatch, useShowLayout } from '~hooks/useKarmycStore'
@@ -37,28 +30,17 @@ const CodePanelSwitch = () => {
     const dispatch = useKarmycDispatch()
 
     return (
-        <FormControl display="flex" flexDirection="row" alignItems="center">
-            <FormLabel
-                color="gray.200"
-                fontSize="xs"
-                mr={2}
-                mb={0}
-                htmlFor="code"
-                pb={0}
-                whiteSpace="nowrap"
-            >
-                Code panel
-            </FormLabel>
-            <LightMode>
-                <Switch
-                    isChecked={showCode}
-                    id="code"
-                    colorScheme="teal"
-                    onChange={() => dispatch.app.toggleCodePanel()}
-                    size="sm"
-                />
-            </LightMode>
-        </FormControl>
+        <Switch.Root
+            checked={showCode}
+            id="code"
+            colorScheme="teal"
+            onChange={() => dispatch.app.toggleCodePanel()}
+            size="sm"
+        >
+            <Switch.HiddenInput />
+            <Switch.Control />
+            <Switch.Label><Text fontSize="sm" color="white">Code panel</Text></Switch.Label>
+        </Switch.Root>
     )
 }
 
@@ -67,49 +49,37 @@ const ResetButton = () => {
     const dispatch = useKarmycDispatch()
 
     return (
-        <Popover>
-            {({ onClose }) => (
-                <>
-                    <PopoverTrigger>
-                        <Button
-                            ml={4}
-                            rightIcon={<SmallCloseIcon />}
-                            size="xs"
-                            variant="unstyled"
-                        >
-                            Clear
-                        </Button>
-                    </PopoverTrigger>
-                    <LightMode>
-                        <PopoverContent zIndex={100} bg="white">
-                            <PopoverArrow />
-                            <PopoverCloseButton />
-                            <PopoverHeader>Are you sure?</PopoverHeader>
-                            <PopoverBody fontSize="sm">
-                                Do you really want to remove all components on the
-                                editor?
-                            </PopoverBody>
-                            <PopoverFooter display="flex" justifyContent="flex-end">
-                                <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    colorScheme="red"
-                                    rightIcon={<CheckIcon path="" />}
-                                    onClick={() => {
-                                        dispatch.components.reset()
-                                        if (onClose) {
-                                            onClose()
-                                        }
-                                    }}
-                                >
-                                    Yes, clear
-                                </Button>
-                            </PopoverFooter>
-                        </PopoverContent>
-                    </LightMode>
-                </>
-            )}
-        </Popover>
+        <Popover.Root>
+            <Popover.Trigger>
+                Clear
+                <X />
+            </Popover.Trigger>
+            <Portal>
+                <Popover.Positioner>
+                    <Popover.Content>
+                        <Popover.Arrow />
+                        <Popover.CloseTrigger />
+                        <Popover.Header>Are you sure?</Popover.Header>
+                        <Popover.Body fontSize="sm">
+                            Do you really want to remove all components on the
+                            editor?
+                        </Popover.Body>
+                        <Popover.Footer display="flex" justifyContent="flex-end">
+                            <Button
+                                size="sm"
+                                variant="ghost"
+                                colorScheme="red"
+                                onClick={() => {
+                                    dispatch.components.reset()
+                                }}
+                            >
+                                Yes, clear <Check />
+                            </Button>
+                        </Popover.Footer>
+                    </Popover.Content>
+                </Popover.Positioner>
+            </Portal>
+        </Popover.Root >
     )
 }
 
@@ -130,37 +100,26 @@ export const AreaInitializer = () => {
 
                 return (
 
-                    <FormControl flexDirection="row" display="flex" alignItems="center">
-                        <Tooltip
+                    <Field.Root flexDirection="row" display="flex" alignItems="center">
+                        <Tooltip.Root
                             zIndex={100}
                             hasArrow
                             bg="yellow.100"
                             aria-label="Builder mode help"
                             label="Builder mode adds extra padding/borders"
                         >
-                            <FormLabel
-                                cursor="help"
-                                color="gray.200"
-                                fontSize="xs"
-                                htmlFor="preview"
-                                pb={0}
-                                mb={0}
-                                mr={2}
-                                whiteSpace="nowrap"
-                            >
+                            <Field.Label>
                                 Builder mode
-                            </FormLabel>
-                        </Tooltip>
-                        <LightMode>
-                            <Switch
-                                isChecked={showLayout}
-                                colorScheme="teal"
-                                size="sm"
-                                onChange={() => dispatch.app.toggleBuilderMode()}
-                                id="preview"
-                            />
-                        </LightMode>
-                    </FormControl>
+                            </Field.Label>
+                        </Tooltip.Root>
+                        <Switch.Root
+                            isChecked={showLayout}
+                            colorScheme="teal"
+                            size="sm"
+                            onChange={() => dispatch.app.toggleBuilderMode()}
+                            id="preview"
+                        />
+                    </Field.Root>
                 )
             },
             { name: 'topOuterLayoutSlot', type: 'menu' },
@@ -260,60 +219,44 @@ const CodeSandboxButton = () => {
     }
 
     return (
-        <Popover>
-            {({ onClose }) => (
-                <>
-                    <PopoverTrigger>
-                        <Button
-                            isLoading={isLoading}
-                            rightIcon={<ExternalLinkIcon path="" />}
-                            variant="ghost"
-                            size="xs"
-                        >
-                            Export code
-                        </Button>
-                    </PopoverTrigger>
-
-                    <LightMode>
-                        <PopoverContent zIndex={100} bg="white">
-                            <PopoverArrow />
-                            <PopoverCloseButton />
-                            <PopoverHeader>Export format</PopoverHeader>
-                            <PopoverBody fontSize="sm">
-                                Export the code in CodeSandbox in which format ?
-                            </PopoverBody>
-                            <PopoverFooter display="flex" justifyContent="flex-end">
-                                <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    colorScheme="blue"
-                                    mr={3}
-                                    onClick={() => {
-                                        exportToCodeSandbox(false)
-                                        if (onClose) {
-                                            onClose()
-                                        }
-                                    }}
-                                >
-                                    JavaScript
-                                </Button>
-                                <Button
-                                    size="sm"
-                                    colorScheme="blue"
-                                    onClick={() => {
-                                        exportToCodeSandbox(true)
-                                        if (onClose) {
-                                            onClose()
-                                        }
-                                    }}
-                                >
-                                    TypeScript
-                                </Button>
-                            </PopoverFooter>
-                        </PopoverContent>
-                    </LightMode>
-                </>
-            )}
-        </Popover>
+        <Popover.Root>
+            <Popover.Trigger>
+                Export code<ExternalLink />
+            </Popover.Trigger>
+            <Portal>
+                <Popover.Positioner>
+                    <Popover.Content>
+                        <Popover.Arrow />
+                        <Popover.CloseTrigger />
+                        <Popover.Header>Export format</Popover.Header>
+                        <Popover.Body fontSize="sm">
+                            Export the code in CodeSandbox in which format ?
+                        </Popover.Body>
+                        <Popover.Footer display="flex" justifyContent="flex-end">
+                            <Button
+                                size="sm"
+                                variant="ghost"
+                                colorScheme="blue"
+                                mr={3}
+                                onClick={() => {
+                                    exportToCodeSandbox(false)
+                                }}
+                            >
+                                JavaScript
+                            </Button>
+                            <Button
+                                size="sm"
+                                colorScheme="blue"
+                                onClick={() => {
+                                    exportToCodeSandbox(true)
+                                }}
+                            >
+                                TypeScript
+                            </Button>
+                        </Popover.Footer>
+                    </Popover.Content>
+                </Popover.Positioner>
+            </Portal>
+        </Popover.Root>
     )
 }

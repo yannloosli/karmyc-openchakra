@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react'
 import { Text, Flex, BoxProps, Box } from '@chakra-ui/react'
-import { SettingsIcon, ArrowUpDownIcon } from '@chakra-ui/icons'
+import { Settings, ArrowUpDown } from 'lucide-react'
 import ActionButton from '~components/inspector/ActionButton'
 
 interface Props extends Pick<IComponent, 'type'> {
@@ -42,7 +42,7 @@ const ElementListItem = forwardRef(
       >
         <Flex justify="space-between" align="center" w="100%">
           <Flex align="center">
-            {draggable && <ArrowUpDownIcon path="" fontSize="xs" mr={2} />}
+            {draggable && <ArrowUpDown size={16} style={{ marginRight: 8 }} />}
             <Text letterSpacing="wide" fontSize="sm" textTransform="capitalize">
               {name || type}
             </Text>
@@ -50,7 +50,7 @@ const ElementListItem = forwardRef(
           <ActionButton
             label="Inspect"
             onClick={onSelect}
-            icon={<SettingsIcon path="" />}
+            icon={<Settings size={16} />}
             colorScheme="blackAlpha"
           />
         </Flex>

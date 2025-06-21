@@ -11,12 +11,12 @@ const DimensionPanel = () => {
 
   return (
     <>
-      <SimpleGrid columns={2} spacingX={1}>
+      <SimpleGrid columns={2} gap={1}>
         <TextControl label="Width" name="width" />
         <TextControl label="Height" name="height" />
       </SimpleGrid>
 
-      <SimpleGrid columns={2} spacingX={1}>
+      <SimpleGrid columns={2} gap={1}>
         <TextControl label="Min W" name="minWidth" />
         <TextControl label="Min H" name="minHeight" />
 
@@ -25,7 +25,7 @@ const DimensionPanel = () => {
       </SimpleGrid>
 
       <FormControl label="Overflow">
-        <Select
+        <Select.Root
           size="sm"
           value={overflow || ''}
           onChange={setValueFromEvent}
@@ -34,7 +34,7 @@ const DimensionPanel = () => {
           <option>visible</option>
           <option>hidden</option>
           <option>scroll</option>
-        </Select>
+        </Select.Root>
       </FormControl>
     </>
   )

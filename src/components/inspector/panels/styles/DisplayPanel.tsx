@@ -1,5 +1,5 @@
 import React, { memo } from 'react'
-import { Select } from '@chakra-ui/react'
+import { Field, Select } from '@chakra-ui/react'
 import FormControl from '~components/inspector/controls/FormControl'
 import { useForm } from '~hooks/useForm'
 import usePropsSelector from '~hooks/usePropsSelector'
@@ -11,8 +11,8 @@ const DisplayPanel = () => {
 
   return (
     <>
-      <FormControl label="Display">
-        <Select
+      <Field.Root label="Display">
+        <Select.Root
           size="sm"
           value={display || ''}
           onChange={setValueFromEvent}
@@ -23,8 +23,8 @@ const DisplayPanel = () => {
           <option>inline</option>
           <option>grid</option>
           <option>inline-block</option>
-        </Select>
-      </FormControl>
+        </Select.Root>
+      </Field.Root>
 
       {display === 'flex' && <FlexPanel />}
     </>

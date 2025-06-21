@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Box, Flex, Stack, Button } from '@chakra-ui/react'
-import { CheckCircleIcon } from '@chakra-ui/icons'
+import { CheckCircle } from 'lucide-react'
 import { FaBomb } from 'react-icons/fa'
 import { gridStyles } from '~components/editor/Editor'
 import { useKarmycDispatch } from '~hooks/useKarmycStore'
@@ -45,7 +45,7 @@ const ErrorBoundary: React.FC<ErrorBoundaryProps> = ({ children }) => {
         <Stack
           alignItems="center"
           direction="row"
-          spacing={8}
+          gap={8}
           bg="white"
           px={6}
           py={6}
@@ -63,11 +63,11 @@ const ErrorBoundary: React.FC<ErrorBoundaryProps> = ({ children }) => {
                 setHasError(false)
               }}
               variant="outline"
-              rightIcon={<CheckCircleIcon path="" />}
               size="sm"
               mt={4}
               display="block"
             >
+              <CheckCircle style={{ marginRight: '4px' }} />
               Reload
             </Button>
           </Box>

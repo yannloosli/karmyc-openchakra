@@ -1,30 +1,32 @@
 import React, { ReactNode, memo } from 'react'
 import {
-  AccordionItem,
-  AccordionButton,
-  AccordionIcon,
-  AccordionPanel,
+  Accordion,
   Box,
-  AccordionItemProps,
+  Text,
 } from '@chakra-ui/react'
 
 const AccordionContainer: React.FC<{
   title: ReactNode
   defaultIsOpen?: boolean
   children: ReactNode
-} & AccordionItemProps> = ({ title, children, defaultIsOpen = true }) => {
+  value?: string
+  disabled?: boolean
+}> = ({ title, children, defaultIsOpen = true, value, disabled }) => {
+  const AccordionItem = Accordion.Item as any
+  
   return (
-    <AccordionItem>
-      {/* <AccordionItem defaultIsOpen={defaultIsOpen}> */}
-      <AccordionButton zIndex={2} px={3} py={2} fontSize="sm">
+    <AccordionItem value={value} disabled={disabled}>
+      <Accordion.ItemTrigger>
         <Box flex="1" textAlign="left">
-          {title}
+          <Text px={2}>{title}</Text>
         </Box>
-        <AccordionIcon />
-      </AccordionButton>
-      <AccordionPanel bg="white" px={3} pb={4}>
-        {children}
-      </AccordionPanel>
+        <Accordion.ItemIndicator />
+      </Accordion.ItemTrigger>
+      <Accordion.ItemContent>
+        <Box p={4}>
+          {children}
+        </Box>
+      </Accordion.ItemContent>
     </AccordionItem>
   )
 }

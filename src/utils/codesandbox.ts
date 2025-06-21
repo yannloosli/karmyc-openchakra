@@ -52,12 +52,9 @@ ReactDOM.render(<App />, rootElement);
   "keywords": [],
   "main": "src/${isTypeScript ? 'index.tsx' : 'index.js'}",
   "dependencies": {
-    "@chakra-ui/icons": "^2.0.9",
-    "@chakra-ui/react": "^2.3.2",
-    "@chakra-ui/theme": "^2.1.11",
-    "@emotion/react": "^11.10.4",
-    "@emotion/styled": "^11.10.4",
-    "framer-motion": "7.3.0",
+    "@chakra-ui/react": "^3.21.0",
+    "@emotion/react": "^11.14.0",
+    "lucide-react": "^0.517.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "^5.0.1"

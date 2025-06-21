@@ -54,13 +54,21 @@ const CodePanel = () => {
       >
         {({ className, style, tokens, getLineProps, getTokenProps }) => (
           <pre className={className} style={style}>
-            {tokens.map((line, i) => (
-              <div key={i} {...getLineProps({ line, key: i })}>
-                {line.map((token, key) => (
-                  <span key={key} {...getTokenProps({ token, key })} />
-                ))}
-              </div>
-            ))}
+            {tokens.map((line, i) => {
+              const lineProps = getLineProps({ line, key: i })
+              const { key, ...linePropsWithoutKey } = lineProps
+              return (
+                <div key={key} {...linePropsWithoutKey}>
+                  {line.map((token, key) => {
+                    const tokenProps = getTokenProps({ token, key })
+                    const { key: tokenKey, ...tokenPropsWithoutKey } = tokenProps
+                    return (
+                      <span key={tokenKey} {...tokenPropsWithoutKey} />
+                    )
+                  })}
+                </div>
+              )
+            })}
           </pre>
         )}
       </Highlight>

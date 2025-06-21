@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import React, { memo, useMemo } from 'react'
 import { Accordion } from '@chakra-ui/react'
 import PaddingPanel from '~components/inspector/panels/styles/PaddingPanel'
 import DimensionPanel from '~components/inspector/panels/styles/DimensionPanel'
@@ -23,83 +23,91 @@ const StylesPanel: React.FC<Props> = ({
   isRoot,
   showChildren,
   parentIsRoot,
-}) => (
-  <Accordion defaultIndex={[0]} allowMultiple>
-    {!isRoot && (
-      <AccordionContainer title="Custom props">
+}) => {
+  // Mémoriser le composant CustomPropsPanel pour éviter les re-rendus inutiles
+  const customPropsPanel = useMemo(() => {
+    if (isRoot) return null
+    return (
+      <AccordionContainer title="Custom props" value="custom-props">
         <CustomPropsPanel />
       </AccordionContainer>
-    )}
+    )
+  }, [isRoot])
 
-    {!isRoot && !parentIsRoot && (
-      <AccordionContainer title="Parent">
-        <ParentInspector />
-      </AccordionContainer>
-    )}
+  return (
+    <Accordion.Root defaultValue={["custom-props"]} multiple>
+      {customPropsPanel}
 
-    {showChildren && (
-      <AccordionContainer title="Children">
-        <ChildrenInspector />
-      </AccordionContainer>
-    )}
+      {!isRoot && !parentIsRoot && (
+        <AccordionContainer title="Parent" value="parent">
+          <ParentInspector />
+        </AccordionContainer>
+      )}
 
-    {!isRoot && (
-      <>
-        <AccordionContainer title="Layout">
-          <DisplayPanel />
+      {showChildren && (
+        <AccordionContainer title="Children" value="children">
+          <ChildrenInspector />
         </AccordionContainer>
-        <AccordionContainer title="Spacing">
-          <PaddingPanel type="margin" />
-          <PaddingPanel type="padding" />
-        </AccordionContainer>
-        <AccordionContainer title="Size">
-          <DimensionPanel />
-        </AccordionContainer>
-        <AccordionContainer title="Typography">
-          <TextPanel />
-        </AccordionContainer>
-      </>
-    )}
+      )}
 
-    <AccordionContainer title="Backgrounds">
-      <ColorsControl
-        withFullColor
-        label="Color"
-        name="backgroundColor"
-        enableHues
-      />
       {!isRoot && (
-        <GradientControl
+        <>
+          <AccordionContainer title="Layout" value="layout">
+            <DisplayPanel />
+          </AccordionContainer>
+          <AccordionContainer title="Spacing" value="spacing">
+            <PaddingPanel type="margin" />
+            <PaddingPanel type="padding" />
+          </AccordionContainer>
+          <AccordionContainer title="Size" value="size">
+            <DimensionPanel />
+          </AccordionContainer>
+          <AccordionContainer title="Typography" value="typography">
+            <TextPanel />
+          </AccordionContainer>
+        </>
+      )}
+
+      <AccordionContainer title="Backgrounds" value="backgrounds">
+        <ColorsControl
           withFullColor
-          label="Gradient"
-          name="bgGradient"
-          options={[
-            'to top',
-            'to top right',
-            'to top left',
-            'to bottom right',
-            'to bottom',
-            'to bottom left',
-            'to right',
-            'to left',
-          ]}
+          label="Color"
+          name="backgroundColor"
           enableHues
         />
+        {!isRoot && (
+          <GradientControl
+            withFullColor
+            label="Gradient"
+            name="bgGradient"
+            options={[
+              'to top',
+              'to top right',
+              'to top left',
+              'to bottom right',
+              'to bottom',
+              'to bottom left',
+              'to right',
+              'to left',
+            ]}
+            enableHues
+          />
+        )}
+      </AccordionContainer>
+
+      {!isRoot && (
+        <>
+          <AccordionContainer title="Border" value="border">
+            <BorderPanel />
+          </AccordionContainer>
+
+          <AccordionContainer title="Effect" value="effect">
+            <EffectsPanel />
+          </AccordionContainer>
+        </>
       )}
-    </AccordionContainer>
-
-    {!isRoot && (
-      <>
-        <AccordionContainer title="Border">
-          <BorderPanel />
-        </AccordionContainer>
-
-        <AccordionContainer title="Effect">
-          <EffectsPanel />
-        </AccordionContainer>
-      </>
-    )}
-  </Accordion>
-)
+    </Accordion.Root>
+  )
+}
 
 export default memo(StylesPanel)
