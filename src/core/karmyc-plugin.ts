@@ -5,6 +5,10 @@ import { generateId } from '~utils/generateId'
 import { duplicateComponent, deleteComponent } from '~utils/recursive'
 import omit from 'lodash/omit'
 import produce from 'immer'
+import { useSpaceHistory } from '@gamesberry/karmyc-core'
+
+// Debug: vérifier si useSpaceHistory est disponible
+console.log('useSpaceHistory disponible:', typeof useSpaceHistory !== 'undefined');
 
 // Types pour la compatibilité
 export type Overlay = undefined | { rect: DOMRect; id: string; type: ComponentType }
@@ -111,10 +115,38 @@ const notifyStateChange = (state: RootState) => {
   })
 }
 
-// Fonctions de persistance
+// Fonctions de persistance utilisant l'espace OpenChakra
 const saveToStorage = (state: RootState) => {
   try {
     if (typeof window !== 'undefined') {
+      // Sauvegarder dans l'espace OpenChakra si disponible
+      const spaceId = localStorage.getItem('openchakra-space-id')
+      if (spaceId) {
+        const spaceDataString = localStorage.getItem(`openchakra-space-${spaceId}`)
+        if (spaceDataString) {
+          const spaceData = JSON.parse(spaceDataString)
+          const currentStoredState = spaceData.sharedState.payload?.openChakraState
+          
+          // Éviter de sauvegarder si l'état est identique (prévenir les boucles)
+          if (JSON.stringify(currentStoredState) !== JSON.stringify(state)) {
+            spaceData.sharedState.payload = {
+              ...spaceData.sharedState.payload,
+              openChakraState: state,
+              lastModified: new Date().toISOString()
+            }
+            localStorage.setItem(`openchakra-space-${spaceId}`, JSON.stringify(spaceData))
+            
+            // Déclencher un événement de sauvegarde
+            window.dispatchEvent(new CustomEvent('openchakra-state-saved', {
+              detail: { spaceId, state, isMigration: false }
+            }))
+          }
+          
+          return
+        }
+      }
+      
+      // Fallback vers l'ancien système si l'espace n'est pas disponible
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
     }
   } catch (error) {
@@ -125,8 +157,24 @@ const saveToStorage = (state: RootState) => {
 const loadFromStorage = (): RootState | null => {
   try {
     if (typeof window !== 'undefined') {
+      // Charger depuis l'espace OpenChakra si disponible
+      const spaceId = localStorage.getItem('openchakra-space-id')
+      if (spaceId) {
+        const spaceDataString = localStorage.getItem(`openchakra-space-${spaceId}`)
+        if (spaceDataString) {
+          const spaceData = JSON.parse(spaceDataString)
+          const savedState = spaceData.sharedState.payload?.openChakraState
+          if (savedState) {
+            console.log('État chargé depuis l\'espace OpenChakra:', spaceId)
+            return savedState
+          }
+        }
+      }
+      
+      // Fallback vers l'ancien système si l'espace n'est pas disponible
       const saved = localStorage.getItem(STORAGE_KEY)
       if (saved) {
+        console.log('État chargé depuis l\'ancien système de stockage')
         return JSON.parse(saved)
       }
     }
@@ -138,11 +186,119 @@ const loadFromStorage = (): RootState | null => {
 
 // Store Zustand pour remplacer Redux
 let currentState: RootState = loadFromStorage() || { ...initialState }
+let isSaving = false // Flag pour éviter les boucles infinies
+
+// Variables globales pour le debouncing
+let saveTimeout: NodeJS.Timeout | null = null;
+let pendingState: RootState | null = null;
+
+// Fonction pour enregistrer un changement dans l'historique du space
+const recordStateChange = (state: RootState) => {
+  try {
+    const spaceId = localStorage.getItem('openchakra-space-id');
+    if (!spaceId) return;
+
+    // Créer un diff pour l'historique
+    const diff = {
+      type: 'openchakra-state-change',
+      timestamp: Date.now(),
+      state: state
+    };
+
+    // Enregistrer le diff dans l'historique du space
+    const spaceDataString = localStorage.getItem(`openchakra-space-${spaceId}`);
+    if (spaceDataString) {
+      const spaceData = JSON.parse(spaceDataString);
+      
+      // Initialiser l'historique s'il n'existe pas
+      if (!spaceData.history) {
+        spaceData.history = {
+          past: [],
+          present: null,
+          future: []
+        };
+      }
+
+      // Ajouter le changement à l'historique
+      if (spaceData.history.present) {
+        spaceData.history.past.push(spaceData.history.present);
+      }
+      spaceData.history.present = diff;
+      spaceData.history.future = []; // Vider le futur quand on fait un nouveau changement
+
+      localStorage.setItem(`openchakra-space-${spaceId}`, JSON.stringify(spaceData));
+      console.log('Changement enregistré dans l\'historique du space - Timestamp:', diff.timestamp, 'Stack:', new Error().stack?.split('\n')[2]?.trim());
+    }
+  } catch (error) {
+    console.warn('Erreur lors de l\'enregistrement dans l\'historique:', error);
+  }
+};
 
 // Fonction pour sauvegarder l'état après chaque modification
-const saveState = () => {
-  saveToStorage(currentState)
-  notifyStateChange(currentState)
+const saveState = (skipHistory = false) => {
+  if (isSaving) return // Éviter les boucles infinies
+  
+  // Log pour identifier quelle action appelle saveState
+  const stack = new Error().stack?.split('\n')[2]?.trim() || 'unknown';
+  console.log('saveState appelé - skipHistory:', skipHistory, 'Stack:', stack);
+  
+  // Si skipHistory = false (vraie modification), sauvegarder immédiatement
+  if (!skipHistory) {
+    console.log('Sauvegarde immédiate pour vraie modification');
+    isSaving = true
+    saveToStorage(currentState)
+    
+    // Enregistrer le changement dans l'historique du space
+    console.log('Enregistrement dans l\'historique - skipHistory:', skipHistory);
+    recordStateChange(currentState)
+    
+    // Toujours notifier les changements d'état pour les mises à jour visuelles
+    notifyStateChange(currentState)
+    
+    // Déclencher l'événement pour la persistance automatique
+    if (typeof window !== 'undefined' && window.dispatchEvent) {
+      console.log('Déclenchement de l\'événement openchakra-state-changed');
+      window.dispatchEvent(new CustomEvent('openchakra-state-changed', {
+        detail: { state: currentState }
+      }))
+    }
+    
+    // Réinitialiser le flag après un délai
+    setTimeout(() => {
+      isSaving = false
+    }, 100)
+    
+    return
+  }
+  
+  // Pour les actions avec skipHistory = true (hover, select, etc.), utiliser le debouncing
+  // Si on a déjà un timeout en cours, on l'annule et on programme une nouvelle sauvegarde
+  if (saveTimeout) {
+    clearTimeout(saveTimeout);
+  }
+  
+  // Stocker l'état en attente
+  pendingState = currentState;
+  
+  // Programmer la sauvegarde avec un délai de 100ms
+  saveTimeout = setTimeout(() => {
+    if (pendingState) {
+      isSaving = true
+      saveToStorage(pendingState)
+      
+      // Toujours notifier les changements d'état pour les mises à jour visuelles
+      notifyStateChange(pendingState)
+      
+      // Réinitialiser les variables
+      pendingState = null;
+      saveTimeout = null;
+      
+      // Réinitialiser le flag après un délai
+      setTimeout(() => {
+        isSaving = false
+      }, 100)
+    }
+  }, 100)
 }
 
 // Actions Redux migrées
@@ -393,7 +549,7 @@ export const actions = {
         },
       },
     }
-    saveState()
+    saveState(true) // Skip history car la sélection ne doit pas être dans l'historique
     return currentState
   },
 
@@ -408,7 +564,7 @@ export const actions = {
         },
       },
     }
-    saveState()
+    saveState(true) // Skip history car la désélection ne doit pas être dans l'historique
     return currentState
   },
 
@@ -425,7 +581,7 @@ export const actions = {
           },
         },
       }
-      saveState()
+      saveState(true) // Skip history car la sélection du parent ne doit pas être dans l'historique
     }
     return currentState
   },
@@ -465,6 +621,7 @@ export const actions = {
   },
 
   hover: (componentId: IComponent['id']) => {
+    console.log('Action HOVER appelée pour:', componentId);
     currentState = {
       ...currentState,
       components: {
@@ -475,11 +632,12 @@ export const actions = {
         },
       },
     }
-    saveState()
+    saveState(true) // Skip history car le hover ne doit pas être dans l'historique
     return currentState
   },
 
   unhover: () => {
+    console.log('Action UNHOVER appelée');
     currentState = {
       ...currentState,
       components: {
@@ -490,58 +648,82 @@ export const actions = {
         },
       },
     }
-    saveState()
+    saveState(true) // Skip history car le unhover ne doit pas être dans l'historique
     return currentState
   },
 
-  // Actions Undo/Redo
-  undo: () => {
-    if (currentState.components.past.length > 0) {
-      const previous = currentState.components.past[currentState.components.past.length - 1]
-      const newPast = currentState.components.past.slice(0, -1)
-
-      currentState = {
-        ...currentState,
-        components: {
-          past: newPast,
-          present: currentState.components.present,
-          future: [currentState.components.present, ...currentState.components.future],
-        },
-      }
-      saveState()
-    }
-    return currentState
-  },
-
-  redo: () => {
-    if (currentState.components.future.length > 0) {
-      const next = currentState.components.future[0]
-      const newFuture = currentState.components.future.slice(1)
-
-      currentState = {
-        ...currentState,
-        components: {
-          past: [...currentState.components.past, currentState.components.present],
-          present: next,
-          future: newFuture,
-        },
-      }
-      saveState()
-    }
-    return currentState
-  },
-
-  // Action pour sauvegarder l'état dans un space Karmyc
+  // Actions de persistance
   saveToSpace: () => {
     // Cette fonction peut être utilisée pour sauvegarder l'état dans un space Karmyc
     // si nécessaire pour une intégration plus avancée
+    
+    // Déclencher un événement pour notifier le système d'espace
+    if (typeof window !== 'undefined' && window.dispatchEvent) {
+      window.dispatchEvent(new CustomEvent('openchakra-state-changed', {
+        detail: { state: currentState }
+      }))
+    }
+    
     return currentState
   },
 
   // Action pour charger l'état depuis un space Karmyc
   loadFromSpace: (spaceData: RootState) => {
     currentState = { ...spaceData }
-    saveState()
+    saveState(true) // Skip history pour éviter les boucles
+    return currentState
+  },
+
+  // Actions pour l'espace OpenChakra
+  initializeOpenChakraSpace: (payload?: { spaceId?: string; spaceName?: string }) => {
+    // Cette action sera gérée par le plugin d'espace
+    if (typeof window !== 'undefined' && window.dispatchEvent) {
+      window.dispatchEvent(new CustomEvent('openchakra-space-action', {
+        detail: { 
+          type: 'INITIALIZE_OPENCHAKRA_SPACE',
+          payload 
+        }
+      }))
+    }
+    return currentState
+  },
+
+  saveOpenChakraStateToSpace: (payload?: { spaceId?: string }) => {
+    // Cette action sera gérée par le plugin d'espace
+    if (typeof window !== 'undefined' && window.dispatchEvent) {
+      window.dispatchEvent(new CustomEvent('openchakra-space-action', {
+        detail: { 
+          type: 'SAVE_OPENCHAKRA_STATE_TO_SPACE',
+          payload 
+        }
+      }))
+    }
+    return currentState
+  },
+
+  loadOpenChakraStateFromSpace: (payload?: { spaceId?: string }) => {
+    // Cette action sera gérée par le plugin d'espace
+    if (typeof window !== 'undefined' && window.dispatchEvent) {
+      window.dispatchEvent(new CustomEvent('openchakra-space-action', {
+        detail: { 
+          type: 'LOAD_OPENCHAKRA_STATE_FROM_SPACE',
+          payload 
+        }
+      }))
+    }
+    return currentState
+  },
+
+  resetOpenChakraSpace: (payload?: { spaceId?: string }) => {
+    // Cette action sera gérée par le plugin d'espace
+    if (typeof window !== 'undefined' && window.dispatchEvent) {
+      window.dispatchEvent(new CustomEvent('openchakra-space-action', {
+        detail: { 
+          type: 'RESET_OPENCHAKRA_SPACE',
+          payload 
+        }
+      }))
+    }
     return currentState
   },
 }
@@ -573,12 +755,14 @@ export const openChakraPlugin: IActionPlugin = {
     'components/setComponentName',
     'components/hover',
     'components/unhover',
-    // Actions Undo/Redo
-    'undo',
-    'redo',
     // Actions de persistance
     'saveToSpace',
     'loadFromSpace',
+    // Actions pour l'espace OpenChakra
+    'initializeOpenChakraSpace',
+    'saveOpenChakraStateToSpace',
+    'loadOpenChakraStateFromSpace',
+    'resetOpenChakraSpace',
   ],
   handler: (action: Action) => {
     const { type, payload } = action
@@ -651,20 +835,26 @@ export const openChakraPlugin: IActionPlugin = {
         actions.unhover()
         break
 
-      // Actions Undo/Redo
-      case 'undo':
-        actions.undo()
-        break
-      case 'redo':
-        actions.redo()
-        break
-
       // Actions de persistance
       case 'saveToSpace':
         actions.saveToSpace()
         break
       case 'loadFromSpace':
         actions.loadFromSpace(payload)
+        break
+
+      // Actions pour l'espace OpenChakra
+      case 'initializeOpenChakraSpace':
+        actions.initializeOpenChakraSpace(payload)
+        break
+      case 'saveOpenChakraStateToSpace':
+        actions.saveOpenChakraStateToSpace(payload)
+        break
+      case 'loadOpenChakraStateFromSpace':
+        actions.loadOpenChakraStateFromSpace(payload)
+        break
+      case 'resetOpenChakraSpace':
+        actions.resetOpenChakraSpace(payload)
         break
     }
   },

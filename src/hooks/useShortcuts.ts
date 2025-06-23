@@ -1,6 +1,7 @@
 import useDispatch from './useDispatch'
 import { useSelectedComponent } from './useKarmycStore'
 import { useHotkeys } from 'react-hotkeys-hook'
+import { useOpenChakraUndoRedo } from './useOpenChakraUndoRedo'
 
 const keyMap = {
   DELETE_NODE: 'Backspace, del',
@@ -21,6 +22,7 @@ const hasNoSpecialKeyPressed = (event: KeyboardEvent | undefined) =>
 const useShortcuts = () => {
   const dispatch = useDispatch()
   const selected = useSelectedComponent()
+  const { undo: spaceUndo, redo: spaceRedo } = useOpenChakraUndoRedo()
 
   const deleteNode = (event: KeyboardEvent | undefined) => {
     if (event) {
@@ -48,7 +50,7 @@ const useShortcuts = () => {
       event.preventDefault()
     }
 
-    dispatch.undo()
+    spaceUndo()
   }
 
   const redo = (event: KeyboardEvent | undefined) => {
@@ -56,7 +58,7 @@ const useShortcuts = () => {
       event.preventDefault()
     }
 
-    dispatch.redo()
+    spaceRedo()
   }
 
   const onUnselect = () => {

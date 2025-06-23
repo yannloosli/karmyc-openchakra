@@ -3,7 +3,7 @@ import { Box, Flex, Stack, Button } from '@chakra-ui/react'
 import { CheckCircle } from 'lucide-react'
 import { FaBomb } from 'react-icons/fa'
 import { gridStyles } from '~components/editor/Editor'
-import { useKarmycDispatch } from '~hooks/useKarmycStore'
+import { useOpenChakraUndoRedo } from '~hooks/useOpenChakraUndoRedo'
 
 type ErrorBoundaryProps = {
   children?: React.ReactNode
@@ -11,27 +11,27 @@ type ErrorBoundaryProps = {
 
 const ErrorBoundary: React.FC<ErrorBoundaryProps> = ({ children }) => {
   const [hasError, setHasError] = useState(false)
-  const dispatch = useKarmycDispatch()
+  const { undo } = useOpenChakraUndoRedo()
 
   useEffect(() => {
     const handleError = (error: ErrorEvent) => {
       console.error('Error caught by boundary:', error)
       setHasError(true)
       // Appeler undo pour récupérer l'état précédent
-      dispatch.undo()
+      undo()
     }
 
     window.addEventListener('error', handleError)
     window.addEventListener('unhandledrejection', (event) => {
       console.error('Unhandled promise rejection:', event.reason)
       setHasError(true)
-      dispatch.undo()
+      undo()
     })
 
     return () => {
       window.removeEventListener('error', handleError)
     }
-  }, [dispatch])
+  }, [undo])
 
   if (hasError) {
     return (

@@ -15,13 +15,16 @@ const SwitchControl: React.FC<SwitchControlPropsType> = ({ name, label }) => {
 
   return (
     <FormControl label={label} htmlFor={name}>
-      <Switch
+      <Switch.Root
         name={name}
         id={name}
         size="sm"
-        isChecked={value || false}
+        checked={value || false}
         onChange={() => setValue(name, !value)}
-      />
+      >
+        <Switch.HiddenInput />
+        <Switch.Control />
+      </Switch.Root>
     </FormControl>
   )
 }

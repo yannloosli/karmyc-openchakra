@@ -100,7 +100,7 @@ const Inspector = () => {
 
     useEffect(() => {
         clearActiveProps()
-    }, [clearActiveProps])
+    }, [clearActiveProps, id])
 
     return (
         <>
@@ -222,7 +222,7 @@ const Inspector = () => {
             )}
 
             <Box pb={1} bg="white" px={3}>
-                <Panels component={component} isRoot={isRoot} />
+                <Panels key={id} component={component} isRoot={isRoot} />
             </Box>
 
             <StylesPanel

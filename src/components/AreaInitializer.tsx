@@ -44,6 +44,40 @@ const CodePanelSwitch = () => {
     )
 }
 
+const BuilderModeSwitch = () => {
+    const showLayout = useShowLayout()
+    const dispatch = useDispatch()
+
+    return (
+        <Tooltip.Root>
+            <Tooltip.Trigger>
+                <>
+                    Builder mode
+                    <Switch.Root
+                        checked={showLayout}
+                        colorScheme="teal"
+                        size="sm"
+                        onChange={() => dispatch.app.toggleBuilderMode()}
+                        id="preview"
+                    >
+                        <Switch.HiddenInput />
+                        <Switch.Control />
+                        <Switch.Label><Text fontSize="sm" color="white">Builder mode</Text></Switch.Label>
+                    </Switch.Root>
+                </>
+            </Tooltip.Trigger>
+            <Tooltip.Positioner>
+                <Tooltip.Content>
+                    Builder mode adds extra padding/borders
+                </Tooltip.Content>
+            </Tooltip.Positioner>
+        </Tooltip.Root >
+    )
+}
+
+
+
+
 // Composant séparé pour le bouton de reset
 const ResetButton = () => {
     const dispatch = useKarmycDispatch()
@@ -90,50 +124,23 @@ export const AreaInitializer = () => {
     useEffect(() => {
         registerRootMenu(
             () => <HeaderMenu />,
-            { name: 'topOuterLeftSlot', type: 'menu' },
+            { name: 'main-menu', type: 'menu' },
             { order: 990, width: 'auto', alignment: 'left' }
         );
         registerRootMenu(
-            () => {
-                const showLayout = useShowLayout()
-                const dispatch = useDispatch()
-
-                return (
-
-                    <Field.Root flexDirection="row" display="flex" alignItems="center">
-                        <Tooltip.Root
-                            zIndex={100}
-                            hasArrow
-                            bg="yellow.100"
-                            aria-label="Builder mode help"
-                            label="Builder mode adds extra padding/borders"
-                        >
-                            <Field.Label>
-                                Builder mode
-                            </Field.Label>
-                        </Tooltip.Root>
-                        <Switch.Root
-                            isChecked={showLayout}
-                            colorScheme="teal"
-                            size="sm"
-                            onChange={() => dispatch.app.toggleBuilderMode()}
-                            id="preview"
-                        />
-                    </Field.Root>
-                )
-            },
-            { name: 'topOuterLayoutSlot', type: 'menu' },
+            () => <BuilderModeSwitch />,
+            { name: 'builder-mode-switch', type: 'menu' },
             { order: 991, width: 'auto', alignment: 'left' }
+        );
+        registerRootMenu(
+            () => <CodePanelSwitch />,
+            { name: 'topOuterLayoutSlot', type: 'menu' },
+            { order: 992, width: 'auto', alignment: 'left' }
         );
         registerRootMenu(
             () => <CodeSandboxButton />,
             { name: 'export-button', type: 'menu' },
             { order: 991, width: 'auto', alignment: 'right' }
-        );
-        registerRootMenu(
-            () => <CodePanelSwitch />,
-            { name: 'topOuterLayoutSlot', type: 'menu' },
-            { order: 991, width: 'auto', alignment: 'left' }
         );
 
         registerRootStatus(

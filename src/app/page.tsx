@@ -12,13 +12,18 @@ import { Global } from '@emotion/react'
 import Metadata from '~components/Metadata'
 import useShortcuts from '~hooks/useShortcuts'
 import { openChakraPlugin } from '~core/karmyc-plugin'
+import { openChakraSpacePlugin } from '~core/openchakra-space-plugin'
+import { useOpenChakraSpaceInitializer } from '~hooks/useOpenChakraSpace'
 
 // Composant wrapper pour gérer le rendu côté client
 function ClientOnlyApp({ isClient }: { isClient: boolean }) {
     useShortcuts()
+    
+    // Initialiser l'espace OpenChakra au démarrage
+    useOpenChakraSpaceInitializer()
 
     const karmycConfig = {
-        plugins: [openChakraPlugin],
+        plugins: [openChakraPlugin, openChakraSpacePlugin],
         initialAreas: [
             { id: 'area-1', type: 'sidebar-area', state: {}, role: AREA_ROLE.SELF },
             { id: 'area-2', type: 'editor-area', state: {}, role: AREA_ROLE.LEAD },

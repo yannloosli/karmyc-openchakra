@@ -1,5 +1,5 @@
 import React, { ReactNode, useState, memo, useEffect } from 'react'
-import { Box, Button, IconButton, Checkbox, Select, Field } from '@chakra-ui/react'
+import { Box, Button, IconButton, Checkbox, Select, Field, Flex } from '@chakra-ui/react'
 import { X } from 'lucide-react'
 import FormControl from './FormControl'
 import { useForm } from '~hooks/useForm'
@@ -26,47 +26,52 @@ type GradientControlPropsType = {
 
 const GradientControl = (props: GradientControlPropsType) => {
     const { setValue } = useForm()
-    const [gradientColor, setGradientColor] = useState(['green.200'])
+    const [gradientFromColor, setGradientFromColor] = useState('green.200')
+    const [gradientToColor, setGradientToColor] = useState('green.200')
+    const [gradientViaColor, setGradientViaColor] = useState('green.200')
     const [directionValue, setDirectionValue] = useState('to right')
     const gradient = usePropsSelector(props.name)
+    const gradientFrom = usePropsSelector('gradientFrom')
+    const gradientVia = usePropsSelector('gradientVia')
+    const gradientTo = usePropsSelector('gradientTo')
     const textGradient = usePropsSelector('bgClip')
 
     // Valeurs par défaut pour les options de gradient
     const defaultOptions: Gradient[] = [
-        'to top',
-        'to top right',
-        'to right',
-        'to bottom right',
-        'to bottom',
-        'to bottom left',
-        'to left',
-        'to top left',
+        'to-t',
+        'to-tr',
+        'to-r',
+        'to-br',
+        'to-b',
+        'to-bl',
+        'to-l',
+        'to-tl',
     ]
 
     const choices = createListCollection({
         items: (props.options || defaultOptions).map((option) => ({ label: option, value: option })),
     })
 
-    const updateValue = () => {
-        if (
-            gradientColor.length >= 2 &&
-            gradient !== `${directionValue}, ${gradientColor.join(', ')}`
-        ) {
+    const updateValue = (name: string, value: string) => {
             setValue(
-                props.name,
-                `${directionValue}, ${gradientColor.join(', ')}`,
-            )
-        }
+                name,
+            value,
+        )
     }
 
     useEffect(() => {
-        updateValue()
+        updateValue('gradientFrom', gradientFromColor)
+        updateValue('gradientVia', gradientViaColor)
+        updateValue('gradientTo', gradientToColor)
+        updateValue(props.name, directionValue)
         //eslint-disable-next-line
-    }, [directionValue, gradientColor])
+    }, [directionValue, gradientFromColor, gradientToColor, gradientViaColor])
 
-    useEffect(() => {
+   /*  useEffect(() => {
         if (gradient === '' || gradient === null) {
-            setGradientColor(['green.200'])
+            setGradientFromColor('green.200')
+            setGradientViaColor('green.200')
+            setGradientToColor('green.200')
         } else {
             try {
                 const parts = gradient.split(',')
@@ -80,24 +85,8 @@ const GradientControl = (props: GradientControlPropsType) => {
                 console.log(e)
             }
         }
-    }, [gradient])
+    }, [gradient, gradientFrom, gradientVia, gradientTo]) */
 
-    const updateGradient = async (value: string, index: number) => {
-        let colorCopy = [...gradientColor]
-        colorCopy[index] = value
-        setGradientColor(colorCopy)
-    }
-
-    const removeGradient = async (index: number) => {
-        let colorCopy = [...gradientColor]
-        colorCopy.splice(index, 1)
-        if (colorCopy.length >= 2) {
-            setGradientColor(colorCopy)
-        } else {
-            setGradientColor(colorCopy)
-            setValue(props.name, null)
-        }
-    }
 
     return (
         <>
@@ -106,15 +95,13 @@ const GradientControl = (props: GradientControlPropsType) => {
                     size="sm"
                     id={'direction'}
                     name={'direction'}
-                    value={directionValue || 'to right'}
+                    value={directionValue || 'to-r'}
                     onValueChange={(e: { value: string }) => {
                         setDirectionValue(e.value)
-                        if (gradientColor.length >= 2) {
-                            setValue(
-                                props.name,
-                                `${e.value}, ${gradientColor.join(', ')}`,
-                            )
-                        }
+                        setValue(
+                            props.name,
+                            e.value,
+                        )
                     }}
                     collection={choices}
                 >
@@ -156,7 +143,67 @@ const GradientControl = (props: GradientControlPropsType) => {
                 </Checkbox.Root>
             </Field.Root>
 
-            {gradientColor.map((e, i) => (
+            <Flex textAlign="right" mt={3} >
+                <Box>
+                    <ColorPickerControl
+                        withFullColor={props.withFullColor}
+                        name={'gradientFrom'}
+                        gradient={false}
+                        index={0}
+
+                    />
+                    <IconButton
+                        asChild
+                        onClick={() => setGradientFromColor("")}
+                        variant="ghost"
+                        marginRight={2}
+                        size="xs"
+                        aria-label="delete"
+                    >
+                        <X size={8} />
+                    </IconButton>
+                </Box>
+                <Box>
+                    <ColorPickerControl
+                        withFullColor={props.withFullColor}
+                        name={'gradientVia'}
+                        gradient={false}
+                        index={0}
+
+                    />
+                    <IconButton
+                        asChild
+                        onClick={() => setGradientViaColor("")}
+                        variant="ghost"
+                        marginRight={2}
+                        size="xs"
+                        aria-label="delete"
+                    >
+                        <X size={8} />
+                    </IconButton>
+                </Box>
+                <Box>
+                    <ColorPickerControl
+                        withFullColor={props.withFullColor}
+                        name={'gradientTo'}
+                        gradient={false}
+                        index={0}
+
+                    />
+                    <IconButton
+                        asChild
+                        onClick={() => setGradientToColor("")}
+                        variant="ghost"
+                        marginRight={2}
+                        size="xs"
+                        aria-label="delete"
+                    >
+                        <X size={8} />
+                    </IconButton>
+                </Box>
+            </Flex>
+
+            {/* {gradientColor.map((e, i) => (
                 <Box textAlign="right" mt={3} key={i}>
                     {i >= 1 && (
                         <IconButton
@@ -180,9 +227,9 @@ const GradientControl = (props: GradientControlPropsType) => {
                         updateGradient={updateGradient}
                     />
                 </Box>
-            ))}
+            ))} */}
 
-            <Box textAlign="right" mt={3}>
+            {/*  <Box textAlign="right" mt={3}>
                 <Button
                     variant="ghost"
                     size="xs"
@@ -190,7 +237,7 @@ const GradientControl = (props: GradientControlPropsType) => {
                 >
                     + Add
                 </Button>
-            </Box>
+            </Box> */}
         </>
     )
 }

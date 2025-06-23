@@ -74,11 +74,14 @@ export const useKarmycDispatch = () => {
       hover: (componentId: IComponent['id']) => actions.hover(componentId),
       unhover: () => actions.unhover(),
     },
-    undo: () => actions.undo(),
-    redo: () => actions.redo(),
     // Actions de persistance
     saveToSpace: () => actions.saveToSpace(),
     loadFromSpace: (spaceData: any) => actions.loadFromSpace(spaceData),
+    // Actions pour l'espace OpenChakra
+    initializeOpenChakraSpace: (payload?: { spaceId?: string; spaceName?: string }) => actions.initializeOpenChakraSpace(payload),
+    saveOpenChakraStateToSpace: (payload?: { spaceId?: string }) => actions.saveOpenChakraStateToSpace(payload),
+    loadOpenChakraStateFromSpace: (payload?: { spaceId?: string }) => actions.loadOpenChakraStateFromSpace(payload),
+    resetOpenChakraSpace: (payload?: { spaceId?: string }) => actions.resetOpenChakraSpace(payload),
   }
 
   return typedDispatch
@@ -140,9 +143,31 @@ export const usePersistState = () => {
     return dispatch.loadFromSpace(spaceData)
   }, [dispatch])
 
+  // Actions pour l'espace OpenChakra
+  const initializeOpenChakraSpace = useCallback((payload?: { spaceId?: string; spaceName?: string }) => {
+    return dispatch.initializeOpenChakraSpace(payload)
+  }, [dispatch])
+
+  const saveOpenChakraStateToSpace = useCallback((payload?: { spaceId?: string }) => {
+    return dispatch.saveOpenChakraStateToSpace(payload)
+  }, [dispatch])
+
+  const loadOpenChakraStateFromSpace = useCallback((payload?: { spaceId?: string }) => {
+    return dispatch.loadOpenChakraStateFromSpace(payload)
+  }, [dispatch])
+
+  const resetOpenChakraSpace = useCallback((payload?: { spaceId?: string }) => {
+    return dispatch.resetOpenChakraSpace(payload)
+  }, [dispatch])
+
   return {
     saveToSpace,
     loadFromSpace,
+    // Actions pour l'espace OpenChakra
+    initializeOpenChakraSpace,
+    saveOpenChakraStateToSpace,
+    loadOpenChakraStateFromSpace,
+    resetOpenChakraSpace,
   }
 }
 
